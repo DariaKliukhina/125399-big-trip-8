@@ -1,4 +1,6 @@
-'use strict';
+import makeFilter from '../src/make-filter.js';
+import makeCard from '../src/make-card.js';
+
 const tripForm = document.querySelector(`.trip-filter`);
 const tripDay = document.querySelector(`.trip-day__items`);
 const timesFilter = [
@@ -40,29 +42,23 @@ const dataStorage = [
     offers: [`Add breakfast +€ 20`, ``]
   }
 ];
-
 const startCount = 7;
+const randomRange = 10;
 
-function getRandomNum()  {
-  return Math.floor(Math.random() * 10);
-}
+const getRandomNum = (count) => {
+  return Math.floor(Math.random() * count);
+};
 
 const getRandomElement = (array) => {
-  return array[Math.floor(Math.random() * array.length)];
+  return array[getRandomNum(array.length)];
 };
 
 const addElement = (parent, currentElement) => {
   parent.insertAdjacentHTML(`beforeEnd`, currentElement);
 };
 
-const filterRender = (id, count, checked = false, disabled = false) => {
-  const input = `<input type="radio" id="filter-${id}" ${disabled && `disabled`} value="${id}" name="filter" ${checked && `checked`}/>`;
-  const label = `<label for="filter-${id}" class="trip-filter__item">${id}</label>`;
-  return `${input} ${label}`;
-};
-
 const createFilterElement = (parent, id, checked, disabled) => {
-  const currentFilter = filterRender(id, checked, disabled);
+  const currentFilter = makeFilter(id, checked, disabled);
   addElement(parent, currentFilter);
 };
 
@@ -74,26 +70,6 @@ const createAllFilters = (array) => {
 
 createAllFilters(timesFilter);
 
-const eventRender = (data) => {
-  return `<article class="trip-point">
-    <i class="trip-icon">${data.icon}</i>
-  <h3 class="trip-point__title">${data.title}</h3>
-  <p class="trip-point__schedule">
-    <span class="trip-point__timetable">10:00&nbsp;&mdash; 11:00</span>
-  <span class="trip-point__duration">1h 30m</span>
-  </p>
-  <p class="trip-point__price">&euro;&nbsp;20</p>
-  <ul class="trip-point__offers">
-  <li>
-    <button class="trip-point__offer">${data.offers[0]}</button>
-  </li>
-  <li>
-    <button class="trip-point__offer">${data.offers[1]}</button>
-  </li>
-  </ul>
-  </article>`;
-};
-
 const clearBlock = (block) => {
   block.innerHTML = ``;
 };
@@ -103,7 +79,7 @@ const filterLabel = document.querySelectorAll(`.trip-filter__item`);
 const renderAllCards = (count) => {
   for (let i = 0; i < count; i++) {
     const currentEvent = getRandomElement(dataStorage);
-    const eventCard = eventRender(currentEvent);
+    const eventCard = makeCard(currentEvent);
     addElement(tripDay, eventCard);
   }
 };
@@ -111,7 +87,7 @@ const renderAllCards = (count) => {
 renderAllCards(startCount);
 
 const onClickHandler = function () {
-  const randomNum = getRandomNum();
+  const randomNum = getRandomNum(randomRange);
   renderAllCards(randomNum);
 };
 

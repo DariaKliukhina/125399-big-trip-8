@@ -1,5 +1,5 @@
-'use strict';
 const path = require(`path`);
+let _dirname;
 module.exports = {
   mode: `development`,
   entry: `./src/main.js`,
