@@ -1,11 +1,11 @@
 const path = require(`path`);
-let _dirname;
+
 module.exports = {
   mode: `development`,
   entry: `./src/main.js`,
   output: {
     filename: `bundle.js`,
-    path: path.join(_dirname, `public`)
+    path: path.join(__dirname, `public`)
   },
   devtool: `source-map`,
   module: {
@@ -15,7 +15,7 @@ module.exports = {
     }]
   },
   devServer: {
-    contentBase: path.join(_dirname, `public`),
+    contentBase: path.join(__dirname, `public`),
     publicPath: `http:/localhost:8080/`,
     hot: true,
     compress: true
