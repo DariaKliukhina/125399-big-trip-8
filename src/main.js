@@ -41,6 +41,8 @@ const dataStorage = [
   }
 ];
 
+const startCount = 7;
+
 function getRandomNum()  {
   return Math.floor(Math.random() * 10);
 }
@@ -73,7 +75,6 @@ const createAllFilters = (array) => {
 createAllFilters(timesFilter);
 
 const eventRender = (data) => {
-
   return `<article class="trip-point">
     <i class="trip-icon">${data.icon}</i>
   <h3 class="trip-point__title">${data.title}</h3>
@@ -91,7 +92,6 @@ const eventRender = (data) => {
   </li>
   </ul>
   </article>`;
-
 };
 
 const clearBlock = (block) => {
@@ -100,18 +100,24 @@ const clearBlock = (block) => {
 
 const filterLabel = document.querySelectorAll(`.trip-filter__item`);
 
-for (let el of filterLabel) {
-  el.addEventListener(`click`, function () {
-    clearBlock(tripDay);
-    onClickHandler();
-  });
-}
-
-function onClickHandler() {
-  const randomNum = getRandomNum();
-  for (let i = 0; i < randomNum; i++) {
+const renderAllCards = (count) => {
+  for (let i = 0; i < count; i++) {
     const currentEvent = getRandomElement(dataStorage);
     const eventCard = eventRender(currentEvent);
     addElement(tripDay, eventCard);
   }
+};
+
+renderAllCards(startCount);
+
+const onClickHandler = function () {
+  const randomNum = getRandomNum();
+  renderAllCards(randomNum);
+};
+
+for (const el of filterLabel) {
+  el.addEventListener(`click`, function () {
+    clearBlock(tripDay);
+    onClickHandler();
+  });
 }
