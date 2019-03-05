@@ -1,21 +1,12 @@
 import makeFilter from './make-filter.js';
 import makeCard from './make-card.js';
-import {pointsData, timesFilter} from './data.js';
+import {timesFilter, allObjects} from './data.js';
 
 const tripForm = document.querySelector(`.trip-filter`);
 const tripDay = document.querySelector(`.trip-day__items`);
 const filterInput = document.getElementsByName(`filter`);
 
-const startCount = 7;
-const randomRange = 10;
-
-const getRandomNum = (count) => {
-  return Math.floor(Math.random() * count);
-};
-
-const getRandomElement = (array) => {
-  return array[getRandomNum(array.length)];
-};
+const startFilter = allObjects.everything;
 
 const addElement = (parent, currentElement) => {
   parent.insertAdjacentHTML(`beforeEnd`, currentElement);
@@ -38,26 +29,6 @@ const clearBlock = (block) => {
   block.innerHTML = ``;
 };
 
-const createPointData = (count, data) => {
-  const newPoints = [];
-
-  for (let i = 0; i < count; i++) {
-    let tempData = data.getEvent();
-    newPoints.push({
-      city: getRandomElement(data.city),
-      event: tempData.event,
-      title: tempData.title,
-      icon: tempData.icon,
-      date: data.date,
-      price: data.price,
-      picture: data.picture,
-      offer: data.offer,
-      description: data.description
-    });
-  }
-  return newPoints;
-};
-
 const createPointElement = (parent, dataEl) => {
   const currentPoint = makeCard(dataEl);
   addElement(parent, currentPoint);
@@ -69,21 +40,22 @@ const createAllPoints = (array) => {
   }
 };
 
-const createNewPoint = (count) => {
-  const currentDataArray = createPointData(count, pointsData);
-  createAllPoints(currentDataArray);
+const getCurrentFilter = (target) => {
+  const currentId = target.getAttribute(`id`);
+  return currentId.split(`-`)[1];
 };
 
-const onClickHandler = () => {
-  const randomNum = getRandomNum(randomRange);
-  createNewPoint(randomNum);
+const renderPoints = (target, data) => {
+  const filter = getCurrentFilter(target);
+  createAllPoints(data[`${filter}`]);
 };
 
-for (let el of filterInput) {
-  el.addEventListener(`change`, function () {
+for (const el of filterInput) {
+  el.addEventListener(`change`, function (evt) {
+    const target = evt.target;
     clearBlock(tripDay);
-    onClickHandler();
+    renderPoints(target, allObjects);
   });
 }
 
-createNewPoint(startCount);
+createAllPoints(startFilter);
