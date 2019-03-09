@@ -145,9 +145,10 @@ const createPointData = (count, data) => {
   return newPoints;
 };
 
-const allObjects = {};
+
 
 const generateData = () => {
+  const allObjects = {};
   for (const el of timesFilter) {
     const currentId = el.id;
     const currentData = createPointData(el.count, pointsData);
@@ -156,6 +157,6 @@ const generateData = () => {
   return allObjects;
 };
 
-generateData();
+const allPoints = generateData();
 
-export {timesFilter, allObjects};
+export {timesFilter, allPoints};

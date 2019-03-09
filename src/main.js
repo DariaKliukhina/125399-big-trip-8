@@ -1,12 +1,14 @@
 import makeFilter from './make-filter.js';
-import makeCard from './make-card.js';
-import {timesFilter, allObjects} from './data.js';
+// import makeCard from './make-card.js';
+import Point from './point.js';
+import PointEdit from "./point-edit.js";
+import {timesFilter, allPoints} from './data.js';
 
 const tripForm = document.querySelector(`.trip-filter`);
 const tripDay = document.querySelector(`.trip-day__items`);
 const filterInput = document.getElementsByName(`filter`);
 
-const startFilter = allObjects.everything;
+const startFilter = allPoints.everything;
 
 const addElement = (parent, currentElement) => {
   parent.insertAdjacentHTML(`beforeEnd`, currentElement);
@@ -29,9 +31,22 @@ const clearBlock = (block) => {
   block.innerHTML = ``;
 };
 
-const createPointElement = (parent, dataEl) => {
-  const currentPoint = makeCard(dataEl);
-  addElement(parent, currentPoint);
+const createPointElement = (parent, data) => {
+  const point = new Point(data);
+  const editPoint = new PointEdit(data);
+  point.onClick = () => {
+    editPoint.render();
+    tripDay.replaceChild(editPoint.element, point.element);
+    point.unrender();
+  };
+
+  editPoint.onSubmit = () => {
+    point.render();
+    tripDay.replaceChild(point.element, editPoint.element);
+    editPoint.reset();
+  };
+
+  addElement(parent, point);
 };
 
 const createAllPoints = (array) => {
@@ -54,7 +69,7 @@ for (const el of filterInput) {
   el.addEventListener(`change`, function (evt) {
     const target = evt.target;
     clearBlock(tripDay);
-    renderPoints(target, allObjects);
+    renderPoints(target, allPoints);
   });
 }
 
