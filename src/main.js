@@ -14,6 +14,10 @@ const addElement = (parent, currentElement) => {
   parent.insertAdjacentHTML(`beforeEnd`, currentElement);
 };
 
+const addPoint = (parent, currentElement) => {
+  parent.appendChild(currentElement.render());
+};
+
 const createFilterElement = (parent, id, checked, disabled) => {
   const currentFilter = makeFilter(id, checked, disabled);
   addElement(parent, currentFilter);
@@ -46,7 +50,7 @@ const createPointElement = (parent, data) => {
     editPoint.reset();
   };
 
-  addElement(parent, point);
+  addPoint(parent, point);
 };
 
 const createAllPoints = (array) => {

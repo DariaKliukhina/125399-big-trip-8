@@ -11,15 +11,17 @@ class Point {
     this._icon = data.icon;
     this._description = data.description;
     this._date = data.day;
-    this._time = data.period;
+    this._time = data.time;
 
     this._element = null;
     this._state = {
       isEdit: false
     };
+
+    this._onEditClick = this._onEditClick.bind(this);
   }
 
-  _onClickHandeler() {
+  _onEditClick() {
     if (typeof this._onClick === `function`) {
       this._onClick();
     }
@@ -54,7 +56,7 @@ class Point {
   }
 
   bind() {
-    this._element.addEventListener(`click`, this._onClickHandeler.bind(this));
+    this._element.addEventListener(`click`, this._onEditClick);
   }
 
   render() {
@@ -64,7 +66,7 @@ class Point {
   }
 
   unbind() {
-    // Удаление обработчиков
+    this._element.removeEventListener(`click`, this._onEditClick);
   }
 
   unrender() {
