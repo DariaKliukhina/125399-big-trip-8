@@ -1,4 +1,4 @@
-import {createElement} from './create-element.js';
+import {createElement} from '../utils/create-element.js';
 
 class Point {
   constructor(data) {
@@ -41,10 +41,10 @@ class Point {
           <i class="trip-icon">${this._icon}</i>
           <h3 class="trip-point__title">${this._title} ${this._city}</h3>
           <p class="trip-point__schedule">
-            <span class="trip-point__timetable">${this._time.period}</span>
-             <span class="trip-point__duration">1h 30m</span>
+            <span class="trip-point__timetable">${this._time.hour}:${this._time.minute}&nbsp;&mdash; ${this._time.hour + 1}:00</span>
+            <span class="trip-point__duration">${this._time.hour + 1 - this._time.hour}h ${this._time.minute}m</span>
           </p>
-          <p class="trip-point__price">${this._price}</p>
+          <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
           <ul class="trip-point__offers">
              ${(Array.from(this._offers).map((offer) => (`
                       <li>

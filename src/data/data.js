@@ -77,9 +77,14 @@ const pointsData = {
   get day() {
     return getRandomElement(this.date);
   },
-  time: [`10:00 — 11:00`, `12:30 — 15:00`, `16:00 — 18:00`],
-  get period() {
-    return getRandomElement(this.time);
+  get time() {
+    const hour = getRandomNum(24);
+    const minute = getRandomNum(59);
+    if (minute < 10) {
+      return {hour, minute: `0${minute}`};
+    } else {
+      return {hour, minute};
+    }
   },
   get price() {
     return Math.floor(Math.random() * 100);
@@ -133,7 +138,7 @@ const createPointData = (count, data) => {
       title: tempData.title,
       icon: tempData.icon,
       date: data.day,
-      time: data.period,
+      time: data.time,
       price: data.price,
       picture: data.picture,
       offer: data.offer,

@@ -1,8 +1,7 @@
-import makeFilter from './make-filter.js';
-// import makeCard from './make-card.js';
-import Point from './point.js';
-import PointEdit from "./point-edit.js";
-import {timesFilter, allPoints} from './data.js';
+import makeFilter from './templates/make-filter.js';
+import Point from './points/point.js';
+import PointEdit from "./points/point-edit.js";
+import {timesFilter, allPoints} from './data/data.js';
 
 const tripForm = document.querySelector(`.trip-filter`);
 const tripDay = document.querySelector(`.trip-day__items`);

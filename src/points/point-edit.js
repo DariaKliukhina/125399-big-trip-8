@@ -1,4 +1,4 @@
-import {createElement} from './create-element.js';
+import {createElement} from '../utils/create-element.js';
 
 class PointEdit {
   constructor(data) {
