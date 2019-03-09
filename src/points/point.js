@@ -42,7 +42,7 @@ class Point {
           <h3 class="trip-point__title">${this._title} ${this._city}</h3>
           <p class="trip-point__schedule">
             <span class="trip-point__timetable">${this._time.hour}:${this._time.minute}&nbsp;&mdash; ${this._time.hour + 1}:00</span>
-            <span class="trip-point__duration">${this._time.hour + 1 - this._time.hour}h ${this._time.minute}m</span>
+            <span class="trip-point__duration">00h ${60 - this._time.minute}m</span>
           </p>
           <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
           <ul class="trip-point__offers">
