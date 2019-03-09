@@ -78,7 +78,7 @@ const pointsData = {
     return getRandomElement(this.date);
   },
   get time() {
-    const hour = getRandomNum(24);
+    const hour = getRandomNum(23);
     const minute = getRandomNum(59);
     if (minute < 10) {
       return {hour, minute: `0${minute}`};

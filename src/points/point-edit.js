@@ -11,6 +11,7 @@ class PointEdit {
     this._icon = data.icon;
     this._description = data.description;
     this._date = data.day;
+    this._time = data.time;
 
     this._element = null;
     this._onSubmit = null;
@@ -84,7 +85,7 @@ class PointEdit {
         
               <label class="point__time">
                 choose time
-                <input class="point__input" type="text" value="00:00 — 00:00" name="time" placeholder="00:00 — 00:00">
+                <input class="point__input" type="text" value="${this._time.hour}:${this._time.minute}&nbsp;&mdash; ${this._time.hour + 1}:00" name="time" placeholder="00:00 — 00:00">
               </label>
         
               <label class="point__price">
