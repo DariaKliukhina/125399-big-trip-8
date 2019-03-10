@@ -77,9 +77,14 @@ const pointsData = {
   get day() {
     return getRandomElement(this.date);
   },
-  time: [`10:00 — 11:00`, `12:30 — 15:00`, `16:00 — 18:00`],
-  get period() {
-    return getRandomElement(this.time);
+  get time() {
+    const hour = getRandomNum(23);
+    const minute = getRandomNum(59);
+    if (minute < 10) {
+      return {hour, minute: `0${minute}`};
+    } else {
+      return {hour, minute};
+    }
   },
   get price() {
     return Math.floor(Math.random() * 100);
@@ -114,9 +119,7 @@ const pointsData = {
     shuffleArray(setOffers);
     const randomNum = getRandomNum(offersCountMax);
 
-    return setOffers.slice(0, randomNum).map((el) => `<li>
-                              <button class="trip-point__offer">${el}</button>
-                            </li>`).join(``);
+    return setOffers.slice(0, randomNum);
   },
   get description() {
     const descriptions = [`Lorem ipsum dolor sit amet, consectetur adipiscing elit.`, `Cras aliquet varius magna, non porta ligula feugiat eget.`, `Fusce tristique felis at fermentum pharetra.`, `Aliquam id orci ut lectus varius viverra.`, `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`, `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`, `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`, `Sed sed nisi sed augue convallis suscipit in sed felis.`, `Aliquam erat volutpat.`, `Nunc fermentum tortor ac porta dapibus.`, `In rutrum ac purus sit amet tempus.`];
@@ -135,7 +138,7 @@ const createPointData = (count, data) => {
       title: tempData.title,
       icon: tempData.icon,
       date: data.day,
-      time: data.period,
+      time: data.time,
       price: data.price,
       picture: data.picture,
       offer: data.offer,
@@ -145,9 +148,8 @@ const createPointData = (count, data) => {
   return newPoints;
 };
 
-const allObjects = {};
-
 const generateData = () => {
+  const allObjects = {};
   for (const el of timesFilter) {
     const currentId = el.id;
     const currentData = createPointData(el.count, pointsData);
@@ -156,6 +158,6 @@ const generateData = () => {
   return allObjects;
 };
 
-generateData();
+const allPoints = generateData();
 
-export {timesFilter, allObjects};
+export {timesFilter, allPoints};
