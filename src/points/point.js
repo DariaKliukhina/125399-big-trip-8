@@ -1,7 +1,8 @@
-import {createElement} from '../utils/create-element.js';
+import PointComponent from '../components/component.js';
 
-class Point {
+class Point extends PointComponent {
   constructor(data) {
+    super();
     this._city = data.city;
     this._title = data.title;
     this._picture = data.picture;
@@ -25,10 +26,6 @@ class Point {
     if (typeof this._onClick === `function`) {
       this._onClick();
     }
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onClick(fn) {
@@ -59,19 +56,8 @@ class Point {
     this._element.addEventListener(`click`, this._onEditClick);
   }
 
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
   unbind() {
     this._element.removeEventListener(`click`, this._onEditClick);
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 }
 

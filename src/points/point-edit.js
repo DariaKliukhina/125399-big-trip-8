@@ -1,7 +1,8 @@
-import {createElement} from '../utils/create-element.js';
+import PointComponent from '../components/component.js';
 
-class PointEdit {
+class PointEdit extends PointComponent {
   constructor(data) {
+    super();
     this._city = data.city;
     this._title = data.title;
     this._picture = data.picture;
@@ -26,10 +27,6 @@ class PointEdit {
 
   set onSubmit(fn) {
     this._onSubmit = fn;
-  }
-
-  get element() {
-    return this._element;
   }
 
   get template() {
@@ -141,17 +138,6 @@ class PointEdit {
             </form>
           </article>
 `;
-  }
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  reset() {
-    this.unbind();
-    this._element = null;
   }
 
   bind() {
