@@ -8,25 +8,88 @@ class PointEdit extends PointComponent {
     this._picture = data.picture;
     this._event = data.event;
     this._price = data.price;
-    this._offers = data.offer;
+    this._offers = data.offers;
+    this._offerPrice = data.offerPrice;
     this._icon = data.icon;
     this._description = data.description;
     this._date = data.day;
     this._time = data.time;
+    this._icons = data.icons;
 
     this._element = null;
     this._onSubmit = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+    this._onFavoriteChange = this._onFavoriteChange.bind(this);
+    this._onIconChange = this._onIconChange.bind(this);
+    this._onOfferChange = this._onOfferChange.bind(this);
   }
 
-  _onSubmitButtonClick() {
+  _processForm(formData) {
+    const entry = {
+      title: ``,
+      price: ``,
+      city: ``,
+      isFavorite: false,
+      time: ``,
+      offers: [],
+      icon: ``
+    };
+
+    const pointEditMapper = PointEdit.createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      if (pointEditMapper[property]) {
+        pointEditMapper[property](value);
+      }
+    }
+
+    return entry;
+  }
+
+  _onSubmitButtonClick(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this._element.querySelector(`.trip-day__items`));
+    const newData = this._processForm(formData);
     if (typeof this._onSubmit === `function`) {
       this._onSubmit();
+    }
+
+    this.update(newData);
+  }
+
+  _onFavoriteChange() {
+    this._state.isFavourite = !this._state.isFavourite;
+    this.unbind();
+    this.bind();
+  }
+
+  _onIconChange(e) {
+    const icons = this._icons;
+    for (let prop in icons) {
+      if (prop.toLocaleLowerCase() === e.target.value) {
+        this._icon = icons[prop];
+      }
+    }
+    this.unbind();
+    this._partialUpdate();
+    this.bind();
+  }
+
+  _onOfferChange(e) {
+    if (e.target.checked === true) {
+      this._price += Number(e.target.value);
+    } else {
+      this._price -= Number(e.target.value);
     }
   }
 
   set onSubmit(fn) {
     this._onSubmit = fn;
+  }
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
   }
 
   get template() {
@@ -55,7 +118,7 @@ class PointEdit extends PointComponent {
                     <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-train" name="travel-way" value="train">
                     <label class="travel-way__select-label" for="travel-way-train">🚂 train</label>
         
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-flight" name="travel-way" value="train" checked>
+                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-flight" name="travel-way" value="flight">
                     <label class="travel-way__select-label" for="travel-way-flight">✈️ flight</label>
                   </div>
         
@@ -71,18 +134,19 @@ class PointEdit extends PointComponent {
         
               <div class="point__destination-wrap">
                 <label class="point__destination-label" for="destination">${this._title}</label>
-                <input class="point__destination-input" list="destination-select" id="destination" value="Chamonix" name="destination">
+                <input class="point__destination-input" list="destination-select" id="destination" value="${this._city}" name="destination">
                 <datalist id="destination-select">
                   <option value="airport"></option>
                   <option value="Geneva"></option>
                   <option value="Chamonix"></option>
-                  <option value="hotel"></option>
+                  <option value="Karaganda"></option>
+                  <option value="Huevokukuevo"></option>
                 </datalist>
               </div>
         
               <label class="point__time">
                 choose time
-                <input class="point__input" type="text" value="${this._time.hour}:${this._time.minute}&nbsp;&mdash; ${this._time.hour + 1}:00" name="time" placeholder="00:00 — 00:00">
+                <input class="point__input" type="text" value="" name="time" placeholder="00:00 — 00:00">
               </label>
         
               <label class="point__price">
@@ -97,7 +161,7 @@ class PointEdit extends PointComponent {
               </div>
         
               <div class="paint__favorite-wrap">
-                <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite">
+                <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite" ${this._state.isFavorite ? `checked` : ``}>
                 <label class="point__favorite" for="favorite">favorite</label>
               </div>
             </header>
@@ -112,9 +176,9 @@ class PointEdit extends PointComponent {
                                  type="checkbox" 
                                  id="${offer.split(` `).join(`-`).toLocaleLowerCase()}" 
                                  name="offer" 
-                                 value="${offer.split(``).join(`-`).toLocaleLowerCase()}">
-                          <label for="add-luggage" class="point__offers-label">
-                            <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price"></span>
+                                 value="${this._offerPrice}">
+                          <label for="${offer.split(` `).join(`-`).toLocaleLowerCase()}" class="point__offers-label">
+                            <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price">${this._offerPrice}</span>
                           </label>
                          `.trim()))).join(``)}
                   </div>
@@ -136,16 +200,79 @@ class PointEdit extends PointComponent {
                 <input type="hidden" class="point__total-price" name="total-price" value="">
               </section>
             </form>
-          </article>
-`;
+          </article>`;
+  }
+  _createCycleListeners() {
+    const offersIpnut = this._element.querySelectorAll(`.point__offers-input`);
+    for (let i = 0; i < offersIpnut.length; i++) {
+      offersIpnut[i].addEventListener(`change`, this._onOfferChange);
+    }
+
+    const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
+    for (let i = 0; i < travelSelect.length; i++) {
+      travelSelect[i].addEventListener(`click`, this._onIconChange);
+    }
+  }
+
+  _removeCycleListeners() {
+    const offersIpnut = this._element.querySelectorAll(`.point__offers-input`);
+    for (let i = 0; i < offersIpnut.length; i++) {
+      offersIpnut[i].removeEventListener(`change`, this._onOfferChange);
+    }
+
+    const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
+    for (let i = 0; i < travelSelect.length; i++) {
+      travelSelect[i].removeEventListener(`click`, this._onIconChange);
+    }
   }
 
   bind() {
     this._element.addEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`#favorite`)
+      .addEventListener(`change`, this._onFavoriteChange);
+
+    this._createCycleListeners();
   }
 
   unbind() {
     this._element.removeEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.point__offers-input`)
+      .removeEventListener(`change`, this._onOfferChange);
+    this._createCycleListeners();
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._city = data.city;
+    this._price = data.price;
+    this._icon = data.icon;
+    this._time = data.time;
+    this._offers = data.offers;
+    this._state.isFavorite = data.isFavorite;
+  }
+
+  static createMapper(target) {
+    return {
+      text: (value) => {
+        target.title = value;
+      },
+      price: (value) => {
+        target.price = value;
+      },
+      city: (value) => {
+        target.city = value;
+      },
+      isFavorite: () => {
+        target.isFavorite = true;
+      },
+      time: (value) => {
+        target.time = value;
+      },
+      offers: (value) => target.offers,
+      icon: (value) => {
+        target.icon = value;
+      }
+    };
   }
 }
 

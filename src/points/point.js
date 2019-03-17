@@ -8,18 +8,23 @@ class Point extends PointComponent {
     this._picture = data.picture;
     this._event = data.event;
     this._price = data.price;
-    this._offers = data.offer;
+    this._offers = data.offers;
+    this._offerPrice = data.offerPrice;
     this._icon = data.icon;
     this._description = data.description;
     this._date = data.day;
     this._time = data.time;
 
+    this._state.isFavorite = false;
+
     this._element = null;
     this._state = {
-      isEdit: false
+      isEdit: false,
     };
 
     this._onEditClick = this._onEditClick.bind(this);
+    this._onFavoriteChange = this._onFavoriteChange.bind(this);
+
   }
 
   _onEditClick() {
@@ -28,6 +33,14 @@ class Point extends PointComponent {
     }
   }
 
+  _onFavoriteChange() {
+    this._state.isFavorite = !this._state.isFavorite;
+  }
+
+
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
+  }
   set onClick(fn) {
     this._onClick = fn;
   }
@@ -58,6 +71,15 @@ class Point extends PointComponent {
 
   unbind() {
     this._element.removeEventListener(`click`, this._onEditClick);
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._city = data.city;
+    this._price = data._price;
+    this._icon = data._icon;
+    this._time = data._time;
+    this._offers = data._offers;
   }
 }
 

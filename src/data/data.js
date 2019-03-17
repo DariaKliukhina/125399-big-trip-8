@@ -69,6 +69,18 @@ const pointsData = {
     'Sightseeing': `🏛`,
     'Restaurant': `🍴`
   },
+  offers: {
+    'Taxi': [`Add luggage`],
+    'Bus': [`Switch to comfort class`],
+    'Train': [`Afglnlf`, `Switch to comfort class`],
+    'Ship': [`test`],
+    'Transport': [`Add luggage`],
+    'Drive': [`test`],
+    'Flight': [`Add luggage`, `Switch to comfort class`],
+    'Check-in': [`Add meal`, `Add alcohol`],
+    'Sightseeing': [`Add meal`, `Add alcohol`],
+    'Restaurant': [`Add meal`, `Add alcohol`]
+  },
   get city() {
     const allCities = [...this.cities];
     return getRandomElement(allCities);
@@ -92,12 +104,9 @@ const pointsData = {
   get picture() {
     return `//picsum.photos/300/150?r=${Math.random()}`;
   },
-  offers: new Set([
-    `Add luggage`,
-    `Switch to comfort class`,
-    `Add meal`,
-    `Choose seats`
-  ]),
+  get offerPrice() {
+    return Math.floor(Math.random() * 30);
+  },
   getEvent() {
     const points = [...this.point];
     const event = points[getRandomNum(points.length)];
@@ -107,9 +116,9 @@ const pointsData = {
         case `Check-in`:
         case `Sightseeing`:
         case `Restaurant`:
-          return {title: `${event} into a`, icon: icons[event]};
+          return {title: `${event} into a`, icon: icons[event], offer: this.offers[event]};
         default:
-          return {title: `${event} to`, icon: icons[event]};
+          return {title: `${event} to`, icon: icons[event], offer: this.offers[event]};
       }
     }
     return false;
@@ -137,11 +146,13 @@ const createPointData = (count, data) => {
       city: data.city,
       title: tempData.title,
       icon: tempData.icon,
+      icons: data.iconPoint,
       date: data.day,
       time: data.time,
       price: data.price,
       picture: data.picture,
-      offer: data.offer,
+      offers: tempData.offer,
+      offerPrice: data.offerPrice,
       description: data.description
     });
   }
