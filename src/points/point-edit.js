@@ -1,4 +1,5 @@
 import PointComponent from '../components/component.js';
+import {createElement} from "../utils/create-element";
 
 class PointEdit extends PointComponent {
   constructor(data) {
@@ -20,7 +21,7 @@ class PointEdit extends PointComponent {
     this._onSubmit = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onFavoriteChange = this._onFavoriteChange.bind(this);
-    this._onIconChange = this._onIconChange.bind(this);
+    this._onEventChange = this._onEventChange.bind(this);
     this._onOfferChange = this._onOfferChange.bind(this);
   }
 
@@ -30,7 +31,7 @@ class PointEdit extends PointComponent {
       price: ``,
       city: ``,
       isFavorite: false,
-      time: ``,
+      time: `10:00`,
       offers: [],
       icon: ``
     };
@@ -50,10 +51,10 @@ class PointEdit extends PointComponent {
   _onSubmitButtonClick(e) {
     e.preventDefault();
 
-    const formData = new FormData(this._element.querySelector(`.trip-day__items`));
+    const formData = new FormData(this._element.querySelector(`.trip-day__items form`));
     const newData = this._processForm(formData);
     if (typeof this._onSubmit === `function`) {
-      this._onSubmit();
+      this._onSubmit(newData);
     }
 
     this.update(newData);
@@ -64,12 +65,12 @@ class PointEdit extends PointComponent {
     this.unbind();
     this.bind();
   }
-
-  _onIconChange(e) {
+  _onEventChange(e) {
     const icons = this._icons;
     for (let prop in icons) {
       if (prop.toLocaleLowerCase() === e.target.value) {
         this._icon = icons[prop];
+        this._title = e.target.value;
       }
     }
     this.unbind();
@@ -88,8 +89,14 @@ class PointEdit extends PointComponent {
   set onSubmit(fn) {
     this._onSubmit = fn;
   }
+
   _partialUpdate() {
-    this._element.innerHTML = this.template;
+    const currentElement = createElement(this.template);
+    const a = document.createElement(`div`);
+    let b = a.innerHTML;
+    b = currentElement;
+    const currentForm = b.firstElementChild.outerHTML;
+    this._element.innerHTML = currentForm;
   }
 
   get template() {
@@ -126,7 +133,7 @@ class PointEdit extends PointComponent {
                     <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-check-in" name="travel-way" value="check-in">
                     <label class="travel-way__select-label" for="travel-way-check-in">🏨 check-in</label>
         
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-sightseeing" name="travel-way" value="sight-seeing">
+                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-sightseeing" name="travel-way" value="sightseeing">
                     <label class="travel-way__select-label" for="travel-way-sightseeing">🏛 sightseeing</label>
                   </div>
                 </div>
@@ -136,11 +143,11 @@ class PointEdit extends PointComponent {
                 <label class="point__destination-label" for="destination">${this._title}</label>
                 <input class="point__destination-input" list="destination-select" id="destination" value="${this._city}" name="destination">
                 <datalist id="destination-select">
-                  <option value="airport"></option>
                   <option value="Geneva"></option>
                   <option value="Chamonix"></option>
-                  <option value="Karaganda"></option>
-                  <option value="Huevokukuevo"></option>
+                   <option value="Oslo"></option>
+                  <option value="Berlin"></option>
+
                 </datalist>
               </div>
         
@@ -210,7 +217,9 @@ class PointEdit extends PointComponent {
 
     const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
     for (let i = 0; i < travelSelect.length; i++) {
-      travelSelect[i].addEventListener(`click`, this._onIconChange);
+      travelSelect[i].addEventListener(`change`, this._onEventChange);
+      //change
+      //попробовать повесить на родителя travel-way__select - проверять таргет
     }
   }
 
@@ -222,7 +231,7 @@ class PointEdit extends PointComponent {
 
     const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
     for (let i = 0; i < travelSelect.length; i++) {
-      travelSelect[i].removeEventListener(`click`, this._onIconChange);
+      travelSelect[i].removeEventListener(`change`, this._onEventChange);
     }
   }
 
@@ -253,22 +262,22 @@ class PointEdit extends PointComponent {
 
   static createMapper(target) {
     return {
-      text: (value) => {
-        target.title = value;
-      },
+
       price: (value) => {
         target.price = value;
       },
-      city: (value) => {
+      destination: (value) => {
         target.city = value;
       },
-      isFavorite: () => {
+      favorite: () => {
         target.isFavorite = true;
       },
       time: (value) => {
         target.time = value;
       },
-      offers: (value) => target.offers,
+      offer: (value) => target.offers.push(value),
+      //тут учесть массив и валуе (число)
+      //к этому офферсу пушить валуе
       icon: (value) => {
         target.icon = value;
       }

@@ -43,10 +43,19 @@ const createPointElement = (parent, data) => {
     point.unrender();
   };
 
-  editPoint.onSubmit = () => {
+  editPoint.onSubmit = (newObject) => {
+    data.title = newObject.title;
+    data.city = newObject.city;
+    data.price = newObject.price;
+    data.icon = newObject.icon;
+    data.time = newObject.time;
+    data.offers = newObject.offers;
+    data.isFavorite = newObject.isFavorite;
+
+    point.update(data);
     point.render();
     tripDay.replaceChild(point.element, editPoint.element);
-    editPoint.reset();
+    editPoint.unrender();
   };
 
   addPoint(parent, point);
@@ -77,3 +86,5 @@ for (const el of filterInput) {
 }
 
 createAllPoints(startFilter);
+
+

@@ -24,7 +24,6 @@ class Point extends PointComponent {
 
     this._onEditClick = this._onEditClick.bind(this);
     this._onFavoriteChange = this._onFavoriteChange.bind(this);
-
   }
 
   _onEditClick() {
@@ -41,6 +40,7 @@ class Point extends PointComponent {
   _partialUpdate() {
     this._element.innerHTML = this.template;
   }
+
   set onClick(fn) {
     this._onClick = fn;
   }
@@ -51,8 +51,8 @@ class Point extends PointComponent {
           <i class="trip-icon">${this._icon}</i>
           <h3 class="trip-point__title">${this._title} ${this._city}</h3>
           <p class="trip-point__schedule">
-            <span class="trip-point__timetable">${this._time.hour}:${this._time.minute}&nbsp;&mdash; ${this._time.hour + 1}:00</span>
-            <span class="trip-point__duration">00h ${60 - this._time.minute}m</span>
+            <span class="trip-point__timetable">${this._time}</span>
+            <span class="trip-point__duration">${this._time}m</span>
           </p>
           <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
           <ul class="trip-point__offers">
