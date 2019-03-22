@@ -16,6 +16,7 @@ class PointEdit extends PointComponent {
     this._date = data.day;
     this._time = data.time;
     this._icons = data.icons;
+    this._offersList = data.offersList;
 
     this._element = null;
     this._onSubmit = null;
@@ -27,13 +28,13 @@ class PointEdit extends PointComponent {
 
   _processForm(formData) {
     const entry = {
-      title: ``,
-      price: ``,
-      city: ``,
+      title: this._title,
+      price: this._price,
+      city: this._city,
       isFavorite: false,
-      time: `10:00`,
-      offers: [],
-      icon: ``
+      time: `00:00`,
+      offers: this._offers,
+      icon: this._icon
     };
 
     const pointEditMapper = PointEdit.createMapper(entry);
@@ -59,7 +60,17 @@ class PointEdit extends PointComponent {
 
     this.update(newData);
   }
+  _onCheckedChange() {
+    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
+    const offers = [];
 
+    for (let offer of offersInput) {
+      const currentOffer = {label: offer.id, checked: offer.checked, cost: offer.value};
+      offers.push(currentOffer);
+    }
+
+    this._offers = offers;
+  }
   _onFavoriteChange() {
     this._state.isFavourite = !this._state.isFavourite;
     this.unbind();
@@ -67,23 +78,38 @@ class PointEdit extends PointComponent {
   }
   _onEventChange(e) {
     const icons = this._icons;
+    const allOffers = this._offersList;
     for (let prop in icons) {
       if (prop.toLocaleLowerCase() === e.target.value) {
         this._icon = icons[prop];
-        this._title = e.target.value;
+        switch (e.target.value) {
+          case `check-in`:
+          case `sightseeing`:
+          case `restaurant`:
+            this._title = e.target.value + ` into `;
+            break;
+          default:
+            this._title = e.target.value + ` to `;
+            break;
+        }
       }
     }
-    this.unbind();
+
+    this._offers = allOffers[e.target.value];
+
     this._partialUpdate();
     this.bind();
   }
-
   _onOfferChange(e) {
     if (e.target.checked === true) {
       this._price += Number(e.target.value);
     } else {
       this._price -= Number(e.target.value);
     }
+
+    this._onCheckedChange();
+    this._partialUpdate();
+    this.bind();
   }
 
   set onSubmit(fn) {
@@ -181,11 +207,11 @@ class PointEdit extends PointComponent {
                 ${(Array.from(this._offers).map((offer) => (`
                           <input class="point__offers-input visually-hidden" 
                                  type="checkbox" 
-                                 id="${offer.split(` `).join(`-`).toLocaleLowerCase()}" 
+                                  id="${offer.label.split(` `).join(`-`).toLocaleLowerCase()}"  
                                  name="offer" 
-                                 value="${this._offerPrice}">
-                          <label for="${offer.split(` `).join(`-`).toLocaleLowerCase()}" class="point__offers-label">
-                            <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price">${this._offerPrice}</span>
+                                 value="${offer.cost}" ${offer.checked ? `checked` : ``}>
+                       <label for="${offer.label.split(` `).join(`-`).toLocaleLowerCase()}" class="point__offers-label">
+                            <span class="point__offer-service">${offer.label}</span> + €<span class="point__offer-price">${offer.cost}</span>
                           </label>
                          `.trim()))).join(``)}
                   </div>
@@ -210,28 +236,26 @@ class PointEdit extends PointComponent {
           </article>`;
   }
   _createCycleListeners() {
-    const offersIpnut = this._element.querySelectorAll(`.point__offers-input`);
-    for (let i = 0; i < offersIpnut.length; i++) {
-      offersIpnut[i].addEventListener(`change`, this._onOfferChange);
+    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
+    for (let i = 0; i < offersInput.length; i++) {
+      offersInput[i].addEventListener(`change`, this._onOfferChange);
     }
 
     const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
     for (let i = 0; i < travelSelect.length; i++) {
-      travelSelect[i].addEventListener(`change`, this._onEventChange);
-      //change
-      //попробовать повесить на родителя travel-way__select - проверять таргет
+      travelSelect[i].addEventListener(`click`, this._onEventChange);
     }
   }
 
   _removeCycleListeners() {
-    const offersIpnut = this._element.querySelectorAll(`.point__offers-input`);
-    for (let i = 0; i < offersIpnut.length; i++) {
-      offersIpnut[i].removeEventListener(`change`, this._onOfferChange);
+    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
+    for (let i = 0; i < offersInput.length; i++) {
+      offersInput[i].removeEventListener(`change`, this._onOfferChange);
     }
 
     const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
     for (let i = 0; i < travelSelect.length; i++) {
-      travelSelect[i].removeEventListener(`change`, this._onEventChange);
+      travelSelect[i].removeEventListener(`click`, this._onEventChange);
     }
   }
 
@@ -247,7 +271,7 @@ class PointEdit extends PointComponent {
     this._element.removeEventListener(`submit`, this._onSubmitButtonClick);
     this._element.querySelector(`.point__offers-input`)
       .removeEventListener(`change`, this._onOfferChange);
-    this._createCycleListeners();
+    this._removeCycleListeners();
   }
 
   update(data) {
@@ -275,9 +299,6 @@ class PointEdit extends PointComponent {
       time: (value) => {
         target.time = value;
       },
-      offer: (value) => target.offers.push(value),
-      //тут учесть массив и валуе (число)
-      //к этому офферсу пушить валуе
       icon: (value) => {
         target.icon = value;
       }

@@ -58,7 +58,7 @@ class Point extends PointComponent {
           <ul class="trip-point__offers">
              ${(Array.from(this._offers).map((offer) => (`
                       <li>
-                         <button class="trip-point__offer">${offer}</button>
+                         <button class="trip-point__offer">${offer.label}</button>
                       </li>`.trim()))).join(``)}
           </ul>
       </article>
@@ -76,10 +76,10 @@ class Point extends PointComponent {
   update(data) {
     this._title = data.title;
     this._city = data.city;
-    this._price = data._price;
-    this._icon = data._icon;
-    this._time = data._time;
-    this._offers = data._offers;
+    this._price = data.price;
+    this._icon = data.icon;
+    this._time = data.time;
+    this._offers = data.offers;
   }
 }
 

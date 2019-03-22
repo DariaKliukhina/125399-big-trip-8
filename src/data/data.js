@@ -46,40 +46,40 @@ const pointsData = {
     `Geneva`
   ]),
   point: new Set([
-    `Taxi`,
-    `Bus`,
-    `Train`,
-    `Ship`,
-    `Transport`,
-    `Drive`,
-    `Flight`,
-    `Check-in`,
-    `Sightseeing`,
-    `Restaurant`
+    `taxi`,
+    `bus`,
+    `train`,
+    `ship`,
+    `transport`,
+    `drive`,
+    `flight`,
+    `check-in`,
+    `sightseeing`,
+    `restaurant`
   ]),
   iconPoint: {
-    'Taxi': `🚕`,
-    'Bus': `🚌`,
-    'Train': `🚂`,
-    'Ship': `🛳️`,
-    'Transport': `🚊`,
-    'Drive': `🚗`,
-    'Flight': `✈`,
-    'Check-in': `🏨`,
-    'Sightseeing': `🏛`,
-    'Restaurant': `🍴`
+    'taxi': `🚕`,
+    'bus': `🚌`,
+    'train': `🚂`,
+    'ship': `🛳️`,
+    'transport': `🚊`,
+    'drive': `🚗`,
+    'flight': `✈`,
+    'check-in': `🏨`,
+    'sightseeing': `🏛`,
+    'restaurant': `🍴`
   },
   offers: {
-    'Taxi': [`Add luggage`],
-    'Bus': [`Switch to comfort class`],
-    'Train': [`Afglnlf`, `Switch to comfort class`],
-    'Ship': [`test`],
-    'Transport': [`Add luggage`],
-    'Drive': [`test`],
-    'Flight': [`Add luggage`, `Switch to comfort class`],
-    'Check-in': [`Add meal`, `Add alcohol`],
-    'Sightseeing': [`Add meal`, `Add alcohol`],
-    'Restaurant': [`Add meal`, `Add alcohol`]
+    'taxi': [{label: `Add luggage`, checked: false, cost: `23`}, {label: `35345`, checked: false, cost: `23`}],
+    'bus': [{label: `test`, checked: false, cost: `23`}, {label: `test`, checked: false, cost: `23`}],
+    'train': [{label: `Add 123`, checked: false, cost: `23`}, {label: `asdfasdf`, checked: false, cost: `23`}],
+    'ship': [{label: `Adasdfasd luggage`, checked: false, cost: `23`}, {label: `234235`, checked: false, cost: `23`}],
+    'transport': [{label: `Add xcvbcxn`, checked: false, cost: `23`}, {label: `adsfgdfh`, checked: false, cost: `23`}],
+    'drive': [{label: `Add xcvnxcn`, checked: false, cost: `23`}, {label: `nbvmcbnm`, checked: false, cost: `23`}],
+    'flight': [{label: `Add something`, checked: false, cost: `23`}, {label: `vip`, checked: false, cost: `23`}],
+    'check-in': [{label: `Add luggage`, checked: false, cost: `23`}, {label: `35345`, checked: false, cost: `23`}],
+    'sightseeing': [{label: `Add luggage`, checked: false, cost: `23`}, {label: `35345`, checked: false, cost: `23`}],
+    'restaurant': [{label: `Add desert`, checked: false, cost: `23`}, {label: `35345`, checked: false, cost: `23`}]
   },
   get city() {
     const allCities = [...this.cities];
@@ -105,22 +105,15 @@ const pointsData = {
     const icons = this.iconPoint;
     if (icons.hasOwnProperty(event)) {
       switch (event) {
-        case `Check-in`:
-        case `Sightseeing`:
-        case `Restaurant`:
+        case `check-in`:
+        case `sightseeing`:
+        case `restaurant`:
           return {title: `${event} into a`, icon: icons[event], offer: this.offers[event]};
         default:
           return {title: `${event} to`, icon: icons[event], offer: this.offers[event]};
       }
     }
     return false;
-  },
-  get offer() {
-    const setOffers = [...this.offers];
-    shuffleArray(setOffers);
-    const randomNum = getRandomNum(offersCountMax);
-
-    return setOffers.slice(0, randomNum);
   },
   get description() {
     const descriptions = [`Lorem ipsum dolor sit amet, consectetur adipiscing elit.`, `Cras aliquet varius magna, non porta ligula feugiat eget.`, `Fusce tristique felis at fermentum pharetra.`, `Aliquam id orci ut lectus varius viverra.`, `Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.`, `Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.`, `Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.`, `Sed sed nisi sed augue convallis suscipit in sed felis.`, `Aliquam erat volutpat.`, `Nunc fermentum tortor ac porta dapibus.`, `In rutrum ac purus sit amet tempus.`];
@@ -145,6 +138,7 @@ const createPointData = (count, data) => {
       picture: data.picture,
       offers: tempData.offer,
       offerPrice: data.offerPrice,
+      offersList: data.offers,
       description: data.description
     });
   }
