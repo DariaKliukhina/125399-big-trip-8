@@ -119,10 +119,10 @@ class PointEdit extends PointComponent {
 
   _partialUpdate() {
     const currentElement = createElement(this.template);
-    const a = document.createElement(`div`);
-    let b = a.innerHTML;
-    b = currentElement;
-    const currentForm = b.firstElementChild.outerHTML;
+    const container = document.createElement(`div`);
+    let filledContainer = container.innerHTML;
+    filledContainer = currentElement;
+    const currentForm = filledContainer.firstElementChild.outerHTML;
     this._element.innerHTML = currentForm;
   }
 
