@@ -35,7 +35,6 @@ function shuffleArray(array) {
   }
 }
 
-const offersCountMax = 3;
 const descriptionCountMax = 4;
 
 const pointsData = {

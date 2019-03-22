@@ -101,6 +101,7 @@ class PointEdit extends PointComponent {
     this.bind();
   }
   _onOfferChange(e) {
+    this._price = Number(this._price);
     if (e.target.checked === true) {
       this._price += Number(e.target.value);
     } else {
