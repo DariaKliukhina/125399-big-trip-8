@@ -58,6 +58,14 @@ const createPointElement = (parent, data) => {
     editPoint.unrender();
   };
 
+  document.addEventListener(`keydown`, function (e) {
+    if (e.keyCode === 27) {
+      point.render();
+      tripDay.replaceChild(point.element, editPoint.element);
+      editPoint.unrender();
+    }
+  });
+
   addPoint(parent, point);
 };
 

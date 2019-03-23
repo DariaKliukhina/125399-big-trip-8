@@ -17,6 +17,7 @@ class PointEdit extends PointComponent {
     this._time = data.time;
     this._icons = data.icons;
     this._offersList = data.offersList;
+    this._startPrice = data.price;
 
     this._element = null;
     this._onSubmit = null;
@@ -95,6 +96,7 @@ class PointEdit extends PointComponent {
       }
     }
 
+    this._price = this._startPrice;
     this._offers = allOffers[e.target.value];
 
     this._partialUpdate();
@@ -186,7 +188,7 @@ class PointEdit extends PointComponent {
               <label class="point__price">
                 write price
                 <span class="point__price-currency">€</span>
-                <input class="point__input" type="text" value="${this._price}" name="price">
+                <input class="point__input" type="text" value="${this._price}" name="price" readonly>
               </label>
         
               <div class="point__buttons">
