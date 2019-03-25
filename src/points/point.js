@@ -1,4 +1,5 @@
-import PointComponent from '../components/component.js';
+import PointComponent from '../components/component';
+import moment from 'moment';
 
 class Point extends PointComponent {
   constructor(data) {
@@ -14,6 +15,8 @@ class Point extends PointComponent {
     this._description = data.description;
     this._date = data.day;
     this._time = data.time;
+    this._timeStart = data.timeStart;
+    this._timeStop = data.timeStop;
 
     this._state.isFavorite = false;
 
@@ -45,6 +48,20 @@ class Point extends PointComponent {
     this._onClick = fn;
   }
 
+  get duration() {
+    const timeParts = this._time.split(` to `);
+
+    const dateStart = moment(timeParts[0]);
+    const dateEnd = moment(timeParts[1]);
+
+
+    const duration = moment.duration(dateEnd.diff(dateStart));
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+
+    return `${hours}H:${minutes}M`;
+  }
+
   get template() {
     return `
         <article class="trip-point">
@@ -52,7 +69,7 @@ class Point extends PointComponent {
           <h3 class="trip-point__title">${this._title} ${this._city}</h3>
           <p class="trip-point__schedule">
             <span class="trip-point__timetable">${this._time}</span>
-            <span class="trip-point__duration">${this._time}m</span>
+            <span class="trip-point__duration">${this.duration}</span>
           </p>
           <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
           <ul class="trip-point__offers">

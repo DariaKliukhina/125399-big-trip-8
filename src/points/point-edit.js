@@ -1,5 +1,6 @@
-import PointComponent from '../components/component.js';
+import PointComponent from '../components/component';
 import {createElement} from "../utils/create-element";
+import flatpickr from 'flatpickr';
 
 class PointEdit extends PointComponent {
   constructor(data) {
@@ -21,8 +22,11 @@ class PointEdit extends PointComponent {
 
     this._element = null;
     this._onSubmit = null;
+    this._onEsc = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+    this._onFormReset = this._onFormReset.bind(this);
     this._onFavoriteChange = this._onFavoriteChange.bind(this);
+    this._onKeyDown = this._onKeyDown.bind(this);
     this._onEventChange = this._onEventChange.bind(this);
     this._onOfferChange = this._onOfferChange.bind(this);
   }
@@ -49,6 +53,23 @@ class PointEdit extends PointComponent {
 
     return entry;
   }
+  set onEsc(fn) {
+    this._onEsc = fn;
+  }
+
+  set onReset(fn) {
+    this._onReset = fn;
+  }
+
+  _onKeyDown(e) {
+    if (e.keyCode === 27) {
+      const initData = {
+        price: this._startPrice
+      };
+
+      this._onEsc(initData);
+    }
+  }
 
   _onSubmitButtonClick(e) {
     e.preventDefault();
@@ -61,16 +82,19 @@ class PointEdit extends PointComponent {
 
     this.update(newData);
   }
-  _onCheckedChange() {
-    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
-    const offers = [];
-
-    for (let offer of offersInput) {
-      const currentOffer = {label: offer.id, checked: offer.checked, cost: offer.value};
-      offers.push(currentOffer);
+  _onFormReset(evt) {
+    evt.preventDefault();
+    if (typeof this._onReset === `function`) {
+      this._onReset();
     }
+  }
 
-    this._offers = offers;
+  _onCheckedChange(e) {
+    for (let offer of this._offers) {
+      if (e.target.id === offer.label.split(` `).join(`-`).toLocaleLowerCase()) {
+        offer.checked = e.currentTarget.checked;
+      }
+    }
   }
   _onFavoriteChange() {
     this._state.isFavourite = !this._state.isFavourite;
@@ -80,7 +104,7 @@ class PointEdit extends PointComponent {
   _onEventChange(e) {
     const icons = this._icons;
     const allOffers = this._offersList;
-    for (let prop in icons) {
+    for (const prop in icons) {
       if (prop.toLocaleLowerCase() === e.target.value) {
         this._icon = icons[prop];
         switch (e.target.value) {
@@ -98,6 +122,9 @@ class PointEdit extends PointComponent {
 
     this._price = this._startPrice;
     this._offers = allOffers[e.target.value];
+    for (let offer of this._offers) {
+      offer.checked = false;
+    }
 
     this._partialUpdate();
     this.bind();
@@ -110,7 +137,7 @@ class PointEdit extends PointComponent {
       this._price -= Number(e.target.value);
     }
 
-    this._onCheckedChange();
+    this._onCheckedChange(e);
     this._partialUpdate();
     this.bind();
   }
@@ -263,17 +290,41 @@ class PointEdit extends PointComponent {
   }
 
   bind() {
+    const pointInput = this.element.querySelector(`input[name="time"]`);
+
     this._element.addEventListener(`submit`, this._onSubmitButtonClick);
+
+    document.addEventListener(`keydown`, this._onKeyDown);
+
     this._element.querySelector(`#favorite`)
       .addEventListener(`change`, this._onFavoriteChange);
+
+    this._element.querySelector(`form`).addEventListener(`reset`, this._onFormReset);
+
+    flatpickr(pointInput, {
+      mode: `range`,
+      time24hr: true,
+      minDate: `today`,
+      enableTime: true,
+      noCalendar: false,
+      altInput: true,
+      altFormat: `H:i`,
+      dateFormat: `H:i`
+    });
 
     this._createCycleListeners();
   }
 
   unbind() {
     this._element.removeEventListener(`submit`, this._onSubmitButtonClick);
+
+    document.removeEventListener(`keydown`, this._onKeyDown);
+
+    this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormReset);
+
     this._element.querySelector(`.point__offers-input`)
       .removeEventListener(`change`, this._onOfferChange);
+
     this._removeCycleListeners();
   }
 
