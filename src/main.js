@@ -40,6 +40,7 @@ const createPointElement = (parent, data) => {
   point.onClick = () => {
     editPoint.render();
     tripDay.replaceChild(editPoint.element, point.element);
+    document.querySelector(`.flatpickr-input.form-control`).value = data.time;
     point.unrender();
   };
 

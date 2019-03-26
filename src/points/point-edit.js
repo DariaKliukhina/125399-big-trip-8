@@ -19,7 +19,6 @@ class PointEdit extends PointComponent {
     this._icons = data.icons;
     this._offersList = data.offersList;
     this._startPrice = data.price;
-
     this._element = null;
     this._onSubmit = null;
     this._onEsc = null;
@@ -37,9 +36,9 @@ class PointEdit extends PointComponent {
       price: this._price,
       city: this._city,
       isFavorite: false,
-      time: `00:00`,
       offers: this._offers,
-      icon: this._icon
+      icon: this._icon,
+      time: this._time
     };
 
     const pointEditMapper = PointEdit.createMapper(entry);
@@ -209,7 +208,7 @@ class PointEdit extends PointComponent {
         
               <label class="point__time">
                 choose time
-                <input class="point__input" type="text" value="" name="time" placeholder="00:00 — 00:00">
+                <input class="point__input" type="text" value="${this._time}" name="time" placeholder="00:00 — 00:00">
               </label>
         
               <label class="point__price">
@@ -304,8 +303,9 @@ class PointEdit extends PointComponent {
     flatpickr(pointInput, {
       mode: `range`,
       time24hr: true,
-      minDate: `today`,
       enableTime: true,
+      minDate: `2018-03-01`,
+      maxDate: `2018-03-01`,
       noCalendar: false,
       altInput: true,
       altFormat: `H:i`,

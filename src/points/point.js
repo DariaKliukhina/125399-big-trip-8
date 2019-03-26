@@ -51,8 +51,8 @@ class Point extends PointComponent {
   get duration() {
     const timeParts = this._time.split(` to `);
 
-    const dateStart = moment(timeParts[0]);
-    const dateEnd = moment(timeParts[1]);
+    const dateStart = moment(timeParts[0], `hh.mm`);
+    const dateEnd = moment(timeParts[1], `hh.mm`);
 
 
     const duration = moment.duration(dateEnd.diff(dateStart));
