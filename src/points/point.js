@@ -1,4 +1,5 @@
-import PointComponent from '../components/component.js';
+import PointComponent from '../components/component';
+import moment from 'moment';
 
 class Point extends PointComponent {
   constructor(data) {
@@ -8,18 +9,24 @@ class Point extends PointComponent {
     this._picture = data.picture;
     this._event = data.event;
     this._price = data.price;
-    this._offers = data.offer;
+    this._offers = data.offers;
+    this._offerPrice = data.offerPrice;
     this._icon = data.icon;
     this._description = data.description;
     this._date = data.day;
     this._time = data.time;
+    this._timeStart = data.timeStart;
+    this._timeStop = data.timeStop;
+
+    this._state.isFavorite = false;
 
     this._element = null;
     this._state = {
-      isEdit: false
+      isEdit: false,
     };
 
     this._onEditClick = this._onEditClick.bind(this);
+    this._onFavoriteChange = this._onFavoriteChange.bind(this);
   }
 
   _onEditClick() {
@@ -28,8 +35,31 @@ class Point extends PointComponent {
     }
   }
 
+  _onFavoriteChange() {
+    this._state.isFavorite = !this._state.isFavorite;
+  }
+
+
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
+  }
+
   set onClick(fn) {
     this._onClick = fn;
+  }
+
+  get duration() {
+    const timeParts = this._time.split(` to `);
+
+    const dateStart = moment(timeParts[0], `hh.mm`);
+    const dateEnd = moment(timeParts[1], `hh.mm`);
+
+
+    const duration = moment.duration(dateEnd.diff(dateStart));
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+
+    return `${hours}H:${minutes}M`;
   }
 
   get template() {
@@ -38,14 +68,14 @@ class Point extends PointComponent {
           <i class="trip-icon">${this._icon}</i>
           <h3 class="trip-point__title">${this._title} ${this._city}</h3>
           <p class="trip-point__schedule">
-            <span class="trip-point__timetable">${this._time.hour}:${this._time.minute}&nbsp;&mdash; ${this._time.hour + 1}:00</span>
-            <span class="trip-point__duration">00h ${60 - this._time.minute}m</span>
+            <span class="trip-point__timetable">${this._time}</span>
+            <span class="trip-point__duration">${this.duration}</span>
           </p>
           <p class="trip-point__price">&euro;&nbsp;${this._price}</p>
           <ul class="trip-point__offers">
              ${(Array.from(this._offers).map((offer) => (`
                       <li>
-                         <button class="trip-point__offer">${offer}</button>
+                         <button class="trip-point__offer">${offer.label}</button>
                       </li>`.trim()))).join(``)}
           </ul>
       </article>
@@ -58,6 +88,15 @@ class Point extends PointComponent {
 
   unbind() {
     this._element.removeEventListener(`click`, this._onEditClick);
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._city = data.city;
+    this._price = data.price;
+    this._icon = data.icon;
+    this._time = data.time;
+    this._offers = data.offers;
   }
 }
 

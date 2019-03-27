@@ -38,6 +38,8 @@ class PointComponent {
     this.unbind();
     this._element = null;
   }
+
+  update() {}
 }
 
 export default PointComponent;

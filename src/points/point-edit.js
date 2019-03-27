@@ -1,4 +1,6 @@
-import PointComponent from '../components/component.js';
+import PointComponent from '../components/component';
+import {createElement} from "../utils/create-element";
+import flatpickr from 'flatpickr';
 
 class PointEdit extends PointComponent {
   constructor(data) {
@@ -8,25 +10,148 @@ class PointEdit extends PointComponent {
     this._picture = data.picture;
     this._event = data.event;
     this._price = data.price;
-    this._offers = data.offer;
+    this._offers = data.offers;
+    this._offerPrice = data.offerPrice;
     this._icon = data.icon;
     this._description = data.description;
     this._date = data.day;
     this._time = data.time;
-
+    this._icons = data.icons;
+    this._offersList = data.offersList;
+    this._startPrice = data.price;
     this._element = null;
     this._onSubmit = null;
+    this._onEsc = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+    this._onFormReset = this._onFormReset.bind(this);
+    this._onFavoriteChange = this._onFavoriteChange.bind(this);
+    this._onKeyDown = this._onKeyDown.bind(this);
+    this._onEventChange = this._onEventChange.bind(this);
+    this._onOfferChange = this._onOfferChange.bind(this);
   }
 
-  _onSubmitButtonClick() {
-    if (typeof this._onSubmit === `function`) {
-      this._onSubmit();
+  _processForm(formData) {
+    const entry = {
+      title: this._title,
+      price: this._price,
+      city: this._city,
+      isFavorite: false,
+      offers: this._offers,
+      icon: this._icon,
+      time: this._time
+    };
+
+    const pointEditMapper = PointEdit.createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      if (pointEditMapper[property]) {
+        pointEditMapper[property](value);
+      }
     }
+
+    return entry;
+  }
+  set onEsc(fn) {
+    this._onEsc = fn;
+  }
+
+  set onReset(fn) {
+    this._onReset = fn;
+  }
+
+  _onKeyDown(e) {
+    if (e.keyCode === 27) {
+      const initData = {
+        price: this._startPrice
+      };
+
+      this._onEsc(initData);
+    }
+  }
+
+  _onSubmitButtonClick(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this._element.querySelector(`.trip-day__items form`));
+    const newData = this._processForm(formData);
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit(newData);
+    }
+
+    this.update(newData);
+  }
+  _onFormReset(evt) {
+    evt.preventDefault();
+    if (typeof this._onReset === `function`) {
+      this._onReset();
+    }
+  }
+
+  _onCheckedChange(e) {
+    for (let offer of this._offers) {
+      if (e.target.id === offer.label.split(` `).join(`-`).toLocaleLowerCase()) {
+        offer.checked = e.currentTarget.checked;
+      }
+    }
+  }
+  _onFavoriteChange() {
+    this._state.isFavourite = !this._state.isFavourite;
+    this.unbind();
+    this.bind();
+  }
+  _onEventChange(e) {
+    const icons = this._icons;
+    const allOffers = this._offersList;
+    for (const prop in icons) {
+      if (prop.toLocaleLowerCase() === e.target.value) {
+        this._icon = icons[prop];
+        switch (e.target.value) {
+          case `check-in`:
+          case `sightseeing`:
+          case `restaurant`:
+            this._title = e.target.value + ` into `;
+            break;
+          default:
+            this._title = e.target.value + ` to `;
+            break;
+        }
+      }
+    }
+
+    this._price = this._startPrice;
+    this._offers = allOffers[e.target.value];
+    for (let offer of this._offers) {
+      offer.checked = false;
+    }
+
+    this._partialUpdate();
+    this.bind();
+  }
+  _onOfferChange(e) {
+    this._price = Number(this._price);
+    if (e.target.checked === true) {
+      this._price += Number(e.target.value);
+    } else {
+      this._price -= Number(e.target.value);
+    }
+
+    this._onCheckedChange(e);
+    this._partialUpdate();
+    this.bind();
   }
 
   set onSubmit(fn) {
     this._onSubmit = fn;
+  }
+
+  _partialUpdate() {
+    const currentElement = createElement(this.template);
+    const container = document.createElement(`div`);
+    let filledContainer = container.innerHTML;
+    filledContainer = currentElement;
+    const currentForm = filledContainer.firstElementChild.outerHTML;
+    this._element.innerHTML = currentForm;
   }
 
   get template() {
@@ -55,7 +180,7 @@ class PointEdit extends PointComponent {
                     <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-train" name="travel-way" value="train">
                     <label class="travel-way__select-label" for="travel-way-train">🚂 train</label>
         
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-flight" name="travel-way" value="train" checked>
+                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-flight" name="travel-way" value="flight">
                     <label class="travel-way__select-label" for="travel-way-flight">✈️ flight</label>
                   </div>
         
@@ -63,7 +188,7 @@ class PointEdit extends PointComponent {
                     <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-check-in" name="travel-way" value="check-in">
                     <label class="travel-way__select-label" for="travel-way-check-in">🏨 check-in</label>
         
-                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-sightseeing" name="travel-way" value="sight-seeing">
+                    <input class="travel-way__select-input visually-hidden" type="radio" id="travel-way-sightseeing" name="travel-way" value="sightseeing">
                     <label class="travel-way__select-label" for="travel-way-sightseeing">🏛 sightseeing</label>
                   </div>
                 </div>
@@ -71,24 +196,25 @@ class PointEdit extends PointComponent {
         
               <div class="point__destination-wrap">
                 <label class="point__destination-label" for="destination">${this._title}</label>
-                <input class="point__destination-input" list="destination-select" id="destination" value="Chamonix" name="destination">
+                <input class="point__destination-input" list="destination-select" id="destination" value="${this._city}" name="destination">
                 <datalist id="destination-select">
-                  <option value="airport"></option>
                   <option value="Geneva"></option>
                   <option value="Chamonix"></option>
-                  <option value="hotel"></option>
+                   <option value="Oslo"></option>
+                  <option value="Berlin"></option>
+
                 </datalist>
               </div>
         
               <label class="point__time">
                 choose time
-                <input class="point__input" type="text" value="${this._time.hour}:${this._time.minute}&nbsp;&mdash; ${this._time.hour + 1}:00" name="time" placeholder="00:00 — 00:00">
+                <input class="point__input" type="text" value="${this._time}" name="time" placeholder="00:00 — 00:00">
               </label>
         
               <label class="point__price">
                 write price
                 <span class="point__price-currency">€</span>
-                <input class="point__input" type="text" value="${this._price}" name="price">
+                <input class="point__input" type="text" value="${this._price}" name="price" readonly>
               </label>
         
               <div class="point__buttons">
@@ -97,7 +223,7 @@ class PointEdit extends PointComponent {
               </div>
         
               <div class="paint__favorite-wrap">
-                <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite">
+                <input type="checkbox" class="point__favorite-input visually-hidden" id="favorite" name="favorite" ${this._state.isFavorite ? `checked` : ``}>
                 <label class="point__favorite" for="favorite">favorite</label>
               </div>
             </header>
@@ -110,11 +236,11 @@ class PointEdit extends PointComponent {
                 ${(Array.from(this._offers).map((offer) => (`
                           <input class="point__offers-input visually-hidden" 
                                  type="checkbox" 
-                                 id="${offer.split(` `).join(`-`).toLocaleLowerCase()}" 
+                                  id="${offer.label.split(` `).join(`-`).toLocaleLowerCase()}"  
                                  name="offer" 
-                                 value="${offer.split(``).join(`-`).toLocaleLowerCase()}">
-                          <label for="add-luggage" class="point__offers-label">
-                            <span class="point__offer-service">${offer}</span> + €<span class="point__offer-price"></span>
+                                 value="${offer.cost}" ${offer.checked ? `checked` : ``}>
+                       <label for="${offer.label.split(` `).join(`-`).toLocaleLowerCase()}" class="point__offers-label">
+                            <span class="point__offer-service">${offer.label}</span> + €<span class="point__offer-price">${offer.cost}</span>
                           </label>
                          `.trim()))).join(``)}
                   </div>
@@ -136,16 +262,101 @@ class PointEdit extends PointComponent {
                 <input type="hidden" class="point__total-price" name="total-price" value="">
               </section>
             </form>
-          </article>
-`;
+          </article>`;
+  }
+  _createCycleListeners() {
+    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
+    for (let i = 0; i < offersInput.length; i++) {
+      offersInput[i].addEventListener(`change`, this._onOfferChange);
+    }
+
+    const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
+    for (let i = 0; i < travelSelect.length; i++) {
+      travelSelect[i].addEventListener(`click`, this._onEventChange);
+    }
+  }
+
+  _removeCycleListeners() {
+    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
+    for (let i = 0; i < offersInput.length; i++) {
+      offersInput[i].removeEventListener(`change`, this._onOfferChange);
+    }
+
+    const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
+    for (let i = 0; i < travelSelect.length; i++) {
+      travelSelect[i].removeEventListener(`click`, this._onEventChange);
+    }
   }
 
   bind() {
+    const pointInput = this.element.querySelector(`input[name="time"]`);
+
     this._element.addEventListener(`submit`, this._onSubmitButtonClick);
+
+    document.addEventListener(`keydown`, this._onKeyDown);
+
+    this._element.querySelector(`#favorite`)
+      .addEventListener(`change`, this._onFavoriteChange);
+
+    this._element.querySelector(`form`).addEventListener(`reset`, this._onFormReset);
+
+    flatpickr(pointInput, {
+      mode: `range`,
+      time24hr: true,
+      enableTime: true,
+      minDate: `2018-03-01`,
+      maxDate: `2018-03-01`,
+      noCalendar: false,
+      altInput: true,
+      altFormat: `H:i`,
+      dateFormat: `H:i`
+    });
+
+    this._createCycleListeners();
   }
 
   unbind() {
     this._element.removeEventListener(`submit`, this._onSubmitButtonClick);
+
+    document.removeEventListener(`keydown`, this._onKeyDown);
+
+    this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormReset);
+
+    this._element.querySelector(`.point__offers-input`)
+      .removeEventListener(`change`, this._onOfferChange);
+
+    this._removeCycleListeners();
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._city = data.city;
+    this._price = data.price;
+    this._icon = data.icon;
+    this._time = data.time;
+    this._offers = data.offers;
+    this._state.isFavorite = data.isFavorite;
+  }
+
+  static createMapper(target) {
+    return {
+
+      price: (value) => {
+        target.price = value;
+      },
+      destination: (value) => {
+        target.city = value;
+      },
+      favorite: () => {
+        target.isFavorite = true;
+      },
+      time: (value) => {
+        target.time = value;
+      },
+      icon: (value) => {
+        target.icon = value;
+      }
+    };
   }
 }
 

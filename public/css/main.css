@@ -308,6 +308,7 @@ input[type=radio]:checked + .trip-sorting__item {
   padding-right: 16px;
   align-self: center;
   box-sizing: border-box;
+  text-transform: capitalize;
 }
 
 .trip-point__schedule {
@@ -431,6 +432,7 @@ input[type=radio]:checked + .trip-sorting__item {
   max-width: 100px;
   color: #999999;
   text-overflow: ellipsis;
+  text-transform: capitalize;
 }
 .point__destination-input {
   border: 0;
