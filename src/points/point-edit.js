@@ -5,6 +5,7 @@ import flatpickr from 'flatpickr';
 class PointEdit extends PointComponent {
   constructor(data) {
     super();
+    this._token = data.token;
     this._city = data.city;
     this._title = data.title;
     this._picture = data.picture;
@@ -22,8 +23,9 @@ class PointEdit extends PointComponent {
     this._element = null;
     this._onSubmit = null;
     this._onEsc = null;
+    this._onDelete = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
-    this._onFormReset = this._onFormReset.bind(this);
+    this._onFormDelete = this._onFormDelete.bind(this);
     this._onFavoriteChange = this._onFavoriteChange.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
     this._onEventChange = this._onEventChange.bind(this);
@@ -56,8 +58,8 @@ class PointEdit extends PointComponent {
     this._onEsc = fn;
   }
 
-  set onReset(fn) {
-    this._onReset = fn;
+  set onDelete(fn) {
+    this._onDelete = fn;
   }
 
   _onKeyDown(e) {
@@ -81,10 +83,10 @@ class PointEdit extends PointComponent {
 
     this.update(newData);
   }
-  _onFormReset(evt) {
+  _onFormDelete(evt) {
     evt.preventDefault();
-    if (typeof this._onReset === `function`) {
-      this._onReset();
+    if (typeof this._onDeletet === `function`) {
+      this.__onDelete();
     }
   }
 
@@ -298,7 +300,7 @@ class PointEdit extends PointComponent {
     this._element.querySelector(`#favorite`)
       .addEventListener(`change`, this._onFavoriteChange);
 
-    this._element.querySelector(`form`).addEventListener(`reset`, this._onFormReset);
+    this._element.querySelector(`form`).addEventListener(`reset`, this._onFormDelete);
 
     flatpickr(pointInput, {
       mode: `range`,
@@ -320,7 +322,7 @@ class PointEdit extends PointComponent {
 
     document.removeEventListener(`keydown`, this._onKeyDown);
 
-    this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormReset);
+    this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormDelete);
 
     this._element.querySelector(`.point__offers-input`)
       .removeEventListener(`change`, this._onOfferChange);

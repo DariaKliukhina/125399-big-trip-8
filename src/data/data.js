@@ -8,7 +8,7 @@ const timesFilter = [
   {
     id: `future`,
     checked: false,
-    disabled: true,
+    disabled: false,
     count: 0
   },
   {
@@ -123,10 +123,20 @@ const pointsData = {
 };
 const createPointData = (count, data) => {
   const newPoints = [];
+  function generateToken(length) {
+    const a = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`.split(``);
+    const b = [];
+    for (let i = 0; i < length; i++) {
+      let j = (Math.random() * (a.length - 1)).toFixed(0);
+      b[i] = a[j];
+    }
+    return b.join(``);
+  }
 
   for (let i = 0; i < count; i++) {
     let tempData = data.getEvent();
     newPoints.push({
+      token: generateToken(32),
       city: data.city,
       title: tempData.title,
       icon: tempData.icon,
@@ -144,14 +154,10 @@ const createPointData = (count, data) => {
   return newPoints;
 };
 
+const filtersCount = getRandomNum(26);
+
 const generateData = () => {
-  const allObjects = {};
-  for (const el of timesFilter) {
-    const currentId = el.id;
-    const currentData = createPointData(el.count, pointsData);
-    allObjects[`${currentId}`] = currentData;
-  }
-  return allObjects;
+  return createPointData(filtersCount, pointsData);
 };
 
 const allPoints = generateData();

@@ -4,6 +4,7 @@ import moment from 'moment';
 class Point extends PointComponent {
   constructor(data) {
     super();
+    this._token = data.token;
     this._city = data.city;
     this._title = data.title;
     this._picture = data.picture;

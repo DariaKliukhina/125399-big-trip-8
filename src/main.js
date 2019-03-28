@@ -5,9 +5,6 @@ import {timesFilter, allPoints} from './data/data.js';
 
 const tripForm = document.querySelector(`.trip-filter`);
 const tripDay = document.querySelector(`.trip-day__items`);
-const filterInput = document.getElementsByName(`filter`);
-
-const startFilter = allPoints.everything;
 
 const addElement = (parent, currentElement) => {
   parent.insertAdjacentHTML(`beforeEnd`, currentElement);
@@ -67,38 +64,57 @@ const createPointElement = (parent, data) => {
     editPoint.unrender();
   };
 
-  editPoint.onReset = () => {
-    point.render();
-    tripDay.replaceChild(point.element, editPoint.element);
+  editPoint.onDelete = () => {
+    deleteTask(editPoint);
+    tripDay.removeChild(editPoint.element);
     editPoint.unrender();
   };
   addPoint(parent, point);
 };
 
-const createAllPoints = (array) => {
-  for (const el of array) {
+const deleteTask = (task) => {
+  for (let i = 0; i < allPoints.length; i++) {
+    if (allPoints[i] === null) {
+      continue;
+    } else if (allPoints[i].token === task._token) {
+      allPoints[i] = null;
+      break;
+    }
+  }
+};
+
+const renderPoints = (data) => {
+  for (const el of data) {
     createPointElement(tripDay, el);
   }
 };
 
-const getCurrentFilter = (target) => {
-  const currentId = target.getAttribute(`id`);
-  return currentId.split(`-`)[1];
+const filterTasks = (tasks, filterName) => {
+  let tasksResult;
+  switch (filterName) {
+    case `everything`:
+      tasksResult = tasks;
+      break;
+
+    case `future`:
+      tasksResult = tasks.filter((it) => it.date > Date.now());
+      break;
+    case `past`:
+      tasksResult = tasks.filter((it) => it.date < Date.now());
+      break;
+  }
+  return tasksResult;
 };
 
-const renderPoints = (target, data) => {
-  const filter = getCurrentFilter(target);
-  createAllPoints(data[`${filter}`]);
-};
+const filterForm = document.querySelector(`.trip-filter`);
 
-for (const el of filterInput) {
-  el.addEventListener(`change`, function (evt) {
-    const target = evt.target;
-    clearBlock(tripDay);
-    renderPoints(target, allPoints);
-  });
-}
+filterForm.addEventListener(`change`, function (evt) {
+  const filterName = evt.target.value;
+  const filteredTasks = filterTasks(allPoints, filterName);
+  clearBlock(tripDay);
+  renderPoints(filteredTasks);
+});
 
-createAllPoints(startFilter);
+renderPoints(allPoints);
 
 
