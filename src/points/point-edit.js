@@ -85,8 +85,8 @@ class PointEdit extends PointComponent {
   }
   _onFormDelete(evt) {
     evt.preventDefault();
-    if (typeof this._onDeletet === `function`) {
-      this.__onDelete();
+    if (typeof this._onDelete === `function`) {
+      this._onDelete();
     }
   }
 
