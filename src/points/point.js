@@ -1,7 +1,7 @@
-import PointComponent from '../components/component';
+import component from '../components/component';
 import moment from 'moment';
 
-class Point extends PointComponent {
+class Point extends component {
   constructor(data) {
     super();
     this._token = data.token;
@@ -39,7 +39,6 @@ class Point extends PointComponent {
   _onFavoriteChange() {
     this._state.isFavorite = !this._state.isFavorite;
   }
-
 
   _partialUpdate() {
     this._element.innerHTML = this.template;

@@ -1,21 +1,18 @@
 const timesFilter = [
   {
-    id: `everything`,
+    name: `everything`,
     checked: true,
     disabled: false,
-    count: 7
   },
   {
-    id: `future`,
+    name: `future`,
     checked: false,
     disabled: false,
-    count: 0
   },
   {
-    id: `past`,
+    name: `past`,
     checked: false,
     disabled: false,
-    count: 10
   }
 ];
 

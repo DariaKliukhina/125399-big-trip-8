@@ -1,35 +1,31 @@
-import makeFilter from './templates/make-filter.js';
-import Point from './points/point.js';
-import PointEdit from "./points/point-edit.js";
-import {timesFilter, allPoints} from './data/data.js';
+import Point from './points/point';
+import PointEdit from './points/point-edit';
+import Filter from "./filter/filter";
+import {timesFilter, allPoints} from './data/data';
+import updateData from "./statistic";
 
 const tripForm = document.querySelector(`.trip-filter`);
 const tripDay = document.querySelector(`.trip-day__items`);
 
 const addElement = (parent, currentElement) => {
-  parent.insertAdjacentHTML(`beforeEnd`, currentElement);
-};
-
-const addPoint = (parent, currentElement) => {
   parent.appendChild(currentElement.render());
 };
-
-const createFilterElement = (parent, id, checked, disabled) => {
-  const currentFilter = makeFilter(id, checked, disabled);
-  addElement(parent, currentFilter);
-};
-
-const createAllFilters = (array) => {
-  for (const el of array) {
-    createFilterElement(tripForm, el.id, el.checked, el.disabled);
-  }
-};
-
-createAllFilters(timesFilter);
 
 const clearBlock = (block) => {
   block.innerHTML = ``;
 };
+const createFilterElement = (parent, data) => {
+  const filterElement = new Filter(data);
+  addElement(parent, filterElement);
+};
+
+const renderFilters = (data) => {
+  for (const el of data) {
+    createFilterElement(tripForm, el);
+  }
+};
+
+renderFilters(timesFilter);
 
 const createPointElement = (parent, data) => {
   const point = new Point(data);
@@ -69,16 +65,13 @@ const createPointElement = (parent, data) => {
     tripDay.removeChild(editPoint.element);
     editPoint.unrender();
   };
-  addPoint(parent, point);
+  addElement(parent, point);
 };
 
 const deleteTask = (task) => {
   for (let i = 0; i < allPoints.length; i++) {
-    if (allPoints[i] === null) {
-      continue;
-    } else if (allPoints[i].token === task._token) {
+    if ((allPoints[i] !== null) && (allPoints[i].token === task._token)) {
       allPoints[i] = null;
-      break;
     }
   }
 };

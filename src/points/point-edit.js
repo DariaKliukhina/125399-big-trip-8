@@ -1,8 +1,8 @@
-import PointComponent from '../components/component';
+import component from '../components/component';
 import {createElement} from "../utils/create-element";
 import flatpickr from 'flatpickr';
 
-class PointEdit extends PointComponent {
+class PointEdit extends component {
   constructor(data) {
     super();
     this._token = data.token;
