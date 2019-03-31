@@ -2,7 +2,7 @@ import Point from './points/point';
 import PointEdit from './points/point-edit';
 import Filter from "./filter/filter";
 import {timesFilter, allPoints} from './data/data';
-import updateData from "./statistic";
+// import updateData from "./statistic";
 
 const tripForm = document.querySelector(`.trip-filter`);
 const tripDay = document.querySelector(`.trip-day__items`);
@@ -14,8 +14,35 @@ const addElement = (parent, currentElement) => {
 const clearBlock = (block) => {
   block.innerHTML = ``;
 };
+
+const filterTasks = (filterName) => {
+  let tasksResult = allPoints;
+
+  switch (filterName) {
+    case `everything`:
+      tasksResult = allPoints;
+      break;
+
+    case `future`:
+      tasksResult = allPoints.filter((it) => it.date > Date.now());
+      break;
+    case `past`:
+      tasksResult = allPoints.filter((it) => it.date < Date.now());
+      break;
+  }
+  return tasksResult;
+};
+
 const createFilterElement = (parent, data) => {
   const filterElement = new Filter(data);
+
+  const filterName = data.name;
+
+  filterElement.onFilter = () => {
+    const filteredTasks = filterTasks(filterName);
+    clearBlock(tripDay);
+    renderPoints(filteredTasks);
+  };
   addElement(parent, filterElement);
 };
 
@@ -81,32 +108,6 @@ const renderPoints = (data) => {
     createPointElement(tripDay, el);
   }
 };
-
-const filterTasks = (tasks, filterName) => {
-  let tasksResult;
-  switch (filterName) {
-    case `everything`:
-      tasksResult = tasks;
-      break;
-
-    case `future`:
-      tasksResult = tasks.filter((it) => it.date > Date.now());
-      break;
-    case `past`:
-      tasksResult = tasks.filter((it) => it.date < Date.now());
-      break;
-  }
-  return tasksResult;
-};
-
-const filterForm = document.querySelector(`.trip-filter`);
-
-filterForm.addEventListener(`change`, function (evt) {
-  const filterName = evt.target.value;
-  const filteredTasks = filterTasks(allPoints, filterName);
-  clearBlock(tripDay);
-  renderPoints(filteredTasks);
-});
 
 renderPoints(allPoints);
 
