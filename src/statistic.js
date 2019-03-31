@@ -11,10 +11,7 @@ moneyCtx.height = BAR_HEIGHT * 6;
 transportCtx.height = BAR_HEIGHT * 4;
 timeSpendCtx.height = BAR_HEIGHT * 4;
 
-const updateData = (data) => {
-  moneyChart.data.datasets.data = data;
-  moneyChart.update();
-};
+// const updateData;
 
 const moneyChart = new Chart(moneyCtx, {
   plugins: [ChartDataLabels],
@@ -146,4 +143,5 @@ const transportChart = new Chart(transportCtx, {
   }
 });
 
-export default updateData;
+export {moneyChart, transportChart};
+
