@@ -16,6 +16,7 @@ class Point extends component {
     this._description = data.description;
     this._date = data.day;
     this._time = data.time;
+    this._eventType = data.eventType;
     this._timeStart = data.timeStart;
     this._timeStop = data.timeStop;
 

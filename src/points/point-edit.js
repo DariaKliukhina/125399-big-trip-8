@@ -20,6 +20,7 @@ class PointEdit extends component {
     this._icons = data.icons;
     this._offersList = data.offersList;
     this._startPrice = data.price;
+    this._eventType = data.eventType;
     this._element = null;
     this._onSubmit = null;
     this._onEsc = null;
@@ -149,8 +150,7 @@ class PointEdit extends component {
 
   _partialUpdate() {
     const currentElement = createElement(this.template);
-    const container = document.createElement(`div`);
-    let filledContainer = container.innerHTML;
+    let filledContainer = document.createElement(`div`).innerHTML;
     filledContainer = currentElement;
     const currentForm = filledContainer.firstElementChild.outerHTML;
     this._element.innerHTML = currentForm;

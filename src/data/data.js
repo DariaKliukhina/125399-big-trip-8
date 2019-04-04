@@ -104,9 +104,9 @@ const pointsData = {
         case `check-in`:
         case `sightseeing`:
         case `restaurant`:
-          return {title: `${event} into a`, icon: icons[event], offer: this.offers[event]};
+          return {title: `${event} into a`, icon: icons[event], offer: this.offers[event], eventType: event};
         default:
-          return {title: `${event} to`, icon: icons[event], offer: this.offers[event]};
+          return {title: `${event} to`, icon: icons[event], offer: this.offers[event], eventType: event};
       }
     }
     return false;
@@ -134,6 +134,7 @@ const createPointData = (count, data) => {
     let tempData = data.getEvent();
     newPoints.push({
       token: generateToken(32),
+      eventType: tempData.eventType,
       city: data.city,
       title: tempData.title,
       icon: tempData.icon,
@@ -151,10 +152,10 @@ const createPointData = (count, data) => {
   return newPoints;
 };
 
-const filtersCount = getRandomNum(26);
+const eventsCount = getRandomNum(26);
 
 const generateData = () => {
-  return createPointData(filtersCount, pointsData);
+  return createPointData(eventsCount, pointsData);
 };
 
 const allPoints = generateData();

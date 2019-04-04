@@ -2,7 +2,7 @@ import Point from './points/point';
 import PointEdit from './points/point-edit';
 import Filter from "./filter/filter";
 import {timesFilter, allPoints} from './data/data';
-import {moneyChart, transportChart} from "./statistic";
+import {getResultMoney, getResultTransport} from "./statistic";
 
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
@@ -13,17 +13,13 @@ const statBtns = document.querySelectorAll(`.view-switch__item`);
 const pointsContainer = document.querySelector(`.main`);
 const statisticContainer = document.querySelector(`.statistic`);
 const allContainers = [pointsContainer, statisticContainer];
-const allCharts = [moneyChart, transportChart];
 const closeAllContainer = () => allContainers.forEach((it) => it.classList.add(HIDDEN_CLASS));
 
-const chartsUpd = () => allCharts.forEach((chart) => chart.update());
 
 const updateCharts = () => {
-// Add update
-
-  chartsUpd();
+  getResultMoney(allPoints);
+  getResultTransport(allPoints);
 };
-
 
 for (const btn of statBtns) {
   btn.addEventListener(`click`, function (e) {
@@ -145,5 +141,3 @@ const renderPoints = (data) => {
 };
 
 renderPoints(allPoints);
-
-
