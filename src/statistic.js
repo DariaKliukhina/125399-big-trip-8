@@ -23,7 +23,10 @@ const getEventsMoney = (events) => {
   }
 
   for (let prop in types) {
-    data.push(types[prop]);
+    if (types.hasOwnProperty(prop)) {
+      data.push(types[prop]);
+    }
+
   }
 
   return {
@@ -65,11 +68,15 @@ const getEventsTransport = (events) => {
   }
 
   for (let prop in transportTypes) {
-    updateData(dataTransport, transportTypes, prop);
+    if (transportTypes.hasOwnProperty(prop)) {
+      updateData(dataTransport, transportTypes, prop);
+    }
   }
 
   for (let prop in otherTypes) {
-    updateData(dataOther, otherTypes, prop);
+    if (otherTypes.hasOwnProperty(prop)) {
+      updateData(dataOther, otherTypes, prop);
+    }
   }
 
   return {
