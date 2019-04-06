@@ -1,9 +1,10 @@
-import PointComponent from '../components/component';
+import component from '../components/component';
 import moment from 'moment';
 
-class Point extends PointComponent {
+class Point extends component {
   constructor(data) {
     super();
+    this._token = data.token;
     this._city = data.city;
     this._title = data.title;
     this._picture = data.picture;
@@ -15,6 +16,7 @@ class Point extends PointComponent {
     this._description = data.description;
     this._date = data.day;
     this._time = data.time;
+    this._eventType = data.eventType;
     this._timeStart = data.timeStart;
     this._timeStop = data.timeStop;
 
@@ -38,7 +40,6 @@ class Point extends PointComponent {
   _onFavoriteChange() {
     this._state.isFavorite = !this._state.isFavorite;
   }
-
 
   _partialUpdate() {
     this._element.innerHTML = this.template;

@@ -1,38 +1,89 @@
-import makeFilter from './templates/make-filter.js';
-import Point from './points/point.js';
-import PointEdit from "./points/point-edit.js";
-import {timesFilter, allPoints} from './data/data.js';
+import Point from './points/point';
+import PointEdit from './points/point-edit';
+import Filter from "./filter/filter";
+import {timesFilter, allPoints} from './data/data';
+import {getResultMoney, getResultTransport} from "./statistic";
 
+const HIDDEN_CLASS = `visually-hidden`;
+const ACTIVE_STAT = `view-switch__item--active`;
 const tripForm = document.querySelector(`.trip-filter`);
 const tripDay = document.querySelector(`.trip-day__items`);
-const filterInput = document.getElementsByName(`filter`);
 
-const startFilter = allPoints.everything;
+const statBtns = document.querySelectorAll(`.view-switch__item`);
+const pointsContainer = document.querySelector(`.main`);
+const statisticContainer = document.querySelector(`.statistic`);
+const allContainers = [pointsContainer, statisticContainer];
+const closeAllContainer = () => allContainers.forEach((it) => it.classList.add(HIDDEN_CLASS));
+
+
+const updateCharts = () => {
+  getResultMoney(allPoints);
+  getResultTransport(allPoints);
+};
+
+for (const btn of statBtns) {
+  btn.addEventListener(`click`, function (e) {
+    e.preventDefault();
+
+    for (const itemBtn of statBtns) {
+      itemBtn.classList.remove(ACTIVE_STAT);
+    }
+    closeAllContainer();
+    e.target.classList.add(ACTIVE_STAT);
+    const target = e.target.href.split(`#`)[1];
+
+    const targetContainer = document.querySelector(`#${target}`);
+    targetContainer.classList.remove(HIDDEN_CLASS);
+    updateCharts();
+  });
+}
 
 const addElement = (parent, currentElement) => {
-  parent.insertAdjacentHTML(`beforeEnd`, currentElement);
-};
-
-const addPoint = (parent, currentElement) => {
   parent.appendChild(currentElement.render());
 };
-
-const createFilterElement = (parent, id, checked, disabled) => {
-  const currentFilter = makeFilter(id, checked, disabled);
-  addElement(parent, currentFilter);
-};
-
-const createAllFilters = (array) => {
-  for (const el of array) {
-    createFilterElement(tripForm, el.id, el.checked, el.disabled);
-  }
-};
-
-createAllFilters(timesFilter);
 
 const clearBlock = (block) => {
   block.innerHTML = ``;
 };
+
+const filterTasks = (filterName) => {
+  let tasksResult = allPoints;
+
+  switch (filterName) {
+    case `everything`:
+      tasksResult = allPoints;
+      break;
+
+    case `future`:
+      tasksResult = allPoints.filter((it) => it.date > Date.now());
+      break;
+    case `past`:
+      tasksResult = allPoints.filter((it) => it.date < Date.now());
+      break;
+  }
+  return tasksResult;
+};
+
+const createFilterElement = (parent, data) => {
+  const filterElement = new Filter(data);
+
+  const filterName = data.name;
+
+  filterElement.onFilter = () => {
+    const filteredTasks = filterTasks(filterName);
+    clearBlock(tripDay);
+    renderPoints(filteredTasks);
+  };
+  addElement(parent, filterElement);
+};
+
+const renderFilters = (data) => {
+  for (const el of data) {
+    createFilterElement(tripForm, el);
+  }
+};
+
+renderFilters(timesFilter);
 
 const createPointElement = (parent, data) => {
   const point = new Point(data);
@@ -67,38 +118,26 @@ const createPointElement = (parent, data) => {
     editPoint.unrender();
   };
 
-  editPoint.onReset = () => {
-    point.render();
-    tripDay.replaceChild(point.element, editPoint.element);
+  editPoint.onDelete = () => {
+    deleteTask(editPoint);
+    tripDay.removeChild(editPoint.element);
     editPoint.unrender();
   };
-  addPoint(parent, point);
+  addElement(parent, point);
 };
 
-const createAllPoints = (array) => {
-  for (const el of array) {
+const deleteTask = (task) => {
+  for (let i = 0; i < allPoints.length; i++) {
+    if ((allPoints[i] !== null) && (allPoints[i].token === task._token)) {
+      allPoints[i] = null;
+    }
+  }
+};
+
+const renderPoints = (data) => {
+  for (const el of data) {
     createPointElement(tripDay, el);
   }
 };
 
-const getCurrentFilter = (target) => {
-  const currentId = target.getAttribute(`id`);
-  return currentId.split(`-`)[1];
-};
-
-const renderPoints = (target, data) => {
-  const filter = getCurrentFilter(target);
-  createAllPoints(data[`${filter}`]);
-};
-
-for (const el of filterInput) {
-  el.addEventListener(`change`, function (evt) {
-    const target = evt.target;
-    clearBlock(tripDay);
-    renderPoints(target, allPoints);
-  });
-}
-
-createAllPoints(startFilter);
-
-
+renderPoints(allPoints);

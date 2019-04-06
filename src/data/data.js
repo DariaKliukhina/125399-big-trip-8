@@ -1,21 +1,18 @@
 const timesFilter = [
   {
-    id: `everything`,
+    name: `everything`,
     checked: true,
     disabled: false,
-    count: 7
   },
   {
-    id: `future`,
-    checked: false,
-    disabled: true,
-    count: 0
-  },
-  {
-    id: `past`,
+    name: `future`,
     checked: false,
     disabled: false,
-    count: 10
+  },
+  {
+    name: `past`,
+    checked: false,
+    disabled: false,
   }
 ];
 
@@ -107,9 +104,9 @@ const pointsData = {
         case `check-in`:
         case `sightseeing`:
         case `restaurant`:
-          return {title: `${event} into a`, icon: icons[event], offer: this.offers[event]};
+          return {title: `${event} into a`, icon: icons[event], offer: this.offers[event], eventType: event};
         default:
-          return {title: `${event} to`, icon: icons[event], offer: this.offers[event]};
+          return {title: `${event} to`, icon: icons[event], offer: this.offers[event], eventType: event};
       }
     }
     return false;
@@ -123,10 +120,21 @@ const pointsData = {
 };
 const createPointData = (count, data) => {
   const newPoints = [];
+  function generateToken(length) {
+    const a = `abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890`.split(``);
+    const b = [];
+    for (let i = 0; i < length; i++) {
+      let j = (Math.random() * (a.length - 1)).toFixed(0);
+      b[i] = a[j];
+    }
+    return b.join(``);
+  }
 
   for (let i = 0; i < count; i++) {
     let tempData = data.getEvent();
     newPoints.push({
+      token: generateToken(32),
+      eventType: tempData.eventType,
       city: data.city,
       title: tempData.title,
       icon: tempData.icon,
@@ -144,14 +152,10 @@ const createPointData = (count, data) => {
   return newPoints;
 };
 
+const eventsCount = getRandomNum(26);
+
 const generateData = () => {
-  const allObjects = {};
-  for (const el of timesFilter) {
-    const currentId = el.id;
-    const currentData = createPointData(el.count, pointsData);
-    allObjects[`${currentId}`] = currentData;
-  }
-  return allObjects;
+  return createPointData(eventsCount, pointsData);
 };
 
 const allPoints = generateData();

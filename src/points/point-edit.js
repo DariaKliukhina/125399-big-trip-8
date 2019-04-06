@@ -1,10 +1,11 @@
-import PointComponent from '../components/component';
+import component from '../components/component';
 import {createElement} from "../utils/create-element";
 import flatpickr from 'flatpickr';
 
-class PointEdit extends PointComponent {
+class PointEdit extends component {
   constructor(data) {
     super();
+    this._token = data.token;
     this._city = data.city;
     this._title = data.title;
     this._picture = data.picture;
@@ -19,11 +20,13 @@ class PointEdit extends PointComponent {
     this._icons = data.icons;
     this._offersList = data.offersList;
     this._startPrice = data.price;
+    this._eventType = data.eventType;
     this._element = null;
     this._onSubmit = null;
     this._onEsc = null;
+    this._onDelete = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
-    this._onFormReset = this._onFormReset.bind(this);
+    this._onFormDelete = this._onFormDelete.bind(this);
     this._onFavoriteChange = this._onFavoriteChange.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
     this._onEventChange = this._onEventChange.bind(this);
@@ -56,8 +59,8 @@ class PointEdit extends PointComponent {
     this._onEsc = fn;
   }
 
-  set onReset(fn) {
-    this._onReset = fn;
+  set onDelete(fn) {
+    this._onDelete = fn;
   }
 
   _onKeyDown(e) {
@@ -81,10 +84,10 @@ class PointEdit extends PointComponent {
 
     this.update(newData);
   }
-  _onFormReset(evt) {
+  _onFormDelete(evt) {
     evt.preventDefault();
-    if (typeof this._onReset === `function`) {
-      this._onReset();
+    if (typeof this._onDelete === `function`) {
+      this._onDelete();
     }
   }
 
@@ -147,8 +150,7 @@ class PointEdit extends PointComponent {
 
   _partialUpdate() {
     const currentElement = createElement(this.template);
-    const container = document.createElement(`div`);
-    let filledContainer = container.innerHTML;
+    let filledContainer = document.createElement(`div`).innerHTML;
     filledContainer = currentElement;
     const currentForm = filledContainer.firstElementChild.outerHTML;
     this._element.innerHTML = currentForm;
@@ -298,7 +300,7 @@ class PointEdit extends PointComponent {
     this._element.querySelector(`#favorite`)
       .addEventListener(`change`, this._onFavoriteChange);
 
-    this._element.querySelector(`form`).addEventListener(`reset`, this._onFormReset);
+    this._element.querySelector(`form`).addEventListener(`reset`, this._onFormDelete);
 
     flatpickr(pointInput, {
       mode: `range`,
@@ -320,7 +322,7 @@ class PointEdit extends PointComponent {
 
     document.removeEventListener(`keydown`, this._onKeyDown);
 
-    this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormReset);
+    this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormDelete);
 
     this._element.querySelector(`.point__offers-input`)
       .removeEventListener(`change`, this._onOfferChange);
