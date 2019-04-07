@@ -85,7 +85,7 @@ const pointsData = {
   get day() {
     return getRandomElement(this.date);
   },
-  time: `12:00 to 14:00`,
+  time: `12:00`,
   get price() {
     return Math.floor(Math.random() * 100);
   },

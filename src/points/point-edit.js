@@ -207,11 +207,12 @@ class PointEdit extends component {
 
                 </datalist>
               </div>
-        
-              <label class="point__time">
+              
+              <div class="point__time">
                 choose time
-                <input class="point__input" type="text" value="${this._time}" name="time" placeholder="00:00 — 00:00">
-              </label>
+                <input class="point__input" type="text" value="${this._time}" name="date-start" placeholder="19:00">
+                <input class="point__input" type="text" value="${this._time}" name="date-end" placeholder="21:00">
+              </div>
         
               <label class="point__price">
                 write price
@@ -302,18 +303,18 @@ class PointEdit extends component {
 
     this._element.querySelector(`form`).addEventListener(`reset`, this._onFormDelete);
 
-    flatpickr(pointInput, {
-      mode: `range`,
-      time24hr: true,
-      enableTime: true,
-      minDate: `2018-03-01`,
-      maxDate: `2018-03-01`,
-      noCalendar: false,
-      altInput: true,
-      altFormat: `H:i`,
-      dateFormat: `H:i`
-    });
-
+    //   flatpickr(pointInput, {
+    //     mode: `range`,
+    //     time24hr: true,
+    //     enableTime: true,
+    //     minDate: `2018-03-01`,
+    //     maxDate: `2018-03-01`,
+    //     noCalendar: false,
+    //     altInput: true,
+    //     altFormat: `H:i`,
+    //     dateFormat: `H:i`
+    //   });
+    //
     this._createCycleListeners();
   }
 

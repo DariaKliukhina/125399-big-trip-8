@@ -1,8 +1,15 @@
 import Point from './points/point';
 import PointEdit from './points/point-edit';
 import Filter from "./filter/filter";
+import API from "./api";
+
 import {timesFilter, allPoints} from './data/data';
 import {getResultMoney, getResultTransport} from "./statistic";
+
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
+const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
+
+const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
@@ -15,6 +22,10 @@ const statisticContainer = document.querySelector(`.statistic`);
 const allContainers = [pointsContainer, statisticContainer];
 const closeAllContainer = () => allContainers.forEach((it) => it.classList.add(HIDDEN_CLASS));
 
+
+api.getDestinations()
+  .then((cards) => {console.log(cards);
+  });
 
 const updateCharts = () => {
   getResultMoney(allPoints);
@@ -91,7 +102,7 @@ const createPointElement = (parent, data) => {
   point.onClick = () => {
     editPoint.render();
     tripDay.replaceChild(editPoint.element, point.element);
-    document.querySelector(`.flatpickr-input.form-control`).value = data.time;
+    // document.querySelector(`.flatpickr-input.form-control`).value = data.time;
     point.unrender();
   };
 
@@ -141,3 +152,5 @@ const renderPoints = (data) => {
 };
 
 renderPoints(allPoints);
+
+
