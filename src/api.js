@@ -1,4 +1,7 @@
-// import PointDataAdapter from './point-data-adapter';
+import ModelPoint from './points-adapter';
+
+const AUTHORIZATION = `Basic eo0w590ik29889a`;
+const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
 
 const Method = {
   GET: `GET`,
@@ -28,7 +31,8 @@ const API = class {
 
   getPoints() {
     return this._load({url: `points`})
-      .then(toJSON);
+      .then(toJSON)
+      .then(ModelPoint.parsePoints);
   }
 
   getDestinations() {
@@ -78,4 +82,4 @@ const API = class {
 };
 
 
-export default API;
+export const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});

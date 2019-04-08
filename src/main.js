@@ -1,15 +1,10 @@
 import Point from './points/point';
 import PointEdit from './points/point-edit';
 import Filter from "./filter/filter";
-import API from "./api";
+import {api} from "./api";
 
-import {timesFilter, allPoints} from './data/data';
+// import {timesFilter, allPoints} from './data/data';
 import {getResultMoney, getResultTransport} from "./statistic";
-
-const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=${Math.random()}`;
-const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
-
-const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
@@ -21,11 +16,6 @@ const pointsContainer = document.querySelector(`.main`);
 const statisticContainer = document.querySelector(`.statistic`);
 const allContainers = [pointsContainer, statisticContainer];
 const closeAllContainer = () => allContainers.forEach((it) => it.classList.add(HIDDEN_CLASS));
-
-
-api.getDestinations()
-  .then((cards) => {console.log(cards);
-  });
 
 const updateCharts = () => {
   getResultMoney(allPoints);
