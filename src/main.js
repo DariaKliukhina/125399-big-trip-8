@@ -84,7 +84,7 @@ const renderFilters = (data) => {
   }
 };
 
-renderFilters(timesFilter);
+// renderFilters(timesFilter);
 
 const createPointElement = (parent, data) => {
   const point = new Point(data);
