@@ -1,5 +1,4 @@
 import component from '../components/component';
-import moment from 'moment';
 
 class Point extends component {
   constructor(data) {

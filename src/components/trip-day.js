@@ -1,6 +1,6 @@
-import Point from "../point/point";
-import PointEdit from "../point/point-edit";
-import {api} from '../backend-api';
+import Point from "../points/point";
+import PointEdit from "../points/point-edit";
+import {api} from '../api';
 
 class TripDay {
   constructor(data) {
@@ -109,7 +109,6 @@ class TripDay {
         api.deletePoint({id})
           .then(() => api.getPoints())
           .then(() => {
-            // Немножко костыль для удаления названия дня из верстки, если точек в этот день стало 0
             this._points[i] = null;
             pointEdit.unrender();
             if (this._points.every((element) => element === null)) {
