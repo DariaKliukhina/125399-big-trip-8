@@ -12,11 +12,12 @@ class PointEdit extends component {
     this._title = data.title;
     this._picture = data.picture;
     this._event = data.event;
+    this._typeIcon = data.typeIcon;
     this._price = data.price;
     this._description = data.description;
     this._date = data.day;
     this._time = data.time;
-    this._offersList = data.offersList;
+    this._offers = data.offers;
     this._startPrice = data.price;
     this._isFavorite = false;
 

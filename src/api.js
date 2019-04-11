@@ -1,7 +1,7 @@
 import ModelPoint from './points-adapter';
 
 const AUTHORIZATION = `Basic eo0w590ik29889a`;
-const END_POINT = `https://es8-demo-srv.appspot.com/big-trip/`;
+const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 
 const Method = {
   GET: `GET`,
@@ -47,37 +47,35 @@ const API = class {
 
   createPoint({point}) {
     return this._load({
-      url: `tasks`,
+      url: `points`,
       method: Method.POST,
       body: JSON.stringify(point),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then(toJSON);
+      .then(toJSON)
+      .then(ModelPoint.parsePoint);
   }
 
   updatePoint({id, data}) {
     return this._load({
-      url: `tasks/${id}`,
+      url: `points/${id}`,
       method: Method.PUT,
       body: JSON.stringify(data),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then(toJSON);
+      .then(toJSON)
+      .then(ModelPoint.parsePoint);
   }
 
-  deleteTask({id}) {
-    return this._load({url: `tasks/${id}`, method: Method.DELETE});
+  deletePoint({id}) {
+    return this._load({url: `points/${id}`, method: Method.DELETE});
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
     headers.append(`Authorization`, this._authorization);
 
     return fetch(`${this._endPoint}/${url}`, {method, body, headers})
-      .then(checkStatus)
-      .catch((err) => {
-        console.error(`fetch error: ${err}`);
-        throw err;
-      });
+      .then(checkStatus);
   }
 };
 
