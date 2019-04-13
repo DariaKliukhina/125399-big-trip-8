@@ -15,36 +15,6 @@ function shuffleArray(array) {
   }
 }
 
-const getTime = (date, dateDue) => {
-  const diffMs = dateDue - date;
-  const diffHrs = Math.floor(diffMs / 3600000);
-  const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
-
-  let hours = date.getHours();
-  let minutes = date.getMinutes();
-  if (hours < 10) {
-    hours = `0` + hours;
-  }
-  if (minutes < 10) {
-    minutes += `0`;
-  }
-
-  let dueHours = dateDue.getHours();
-  let dueMinutes = dateDue.getMinutes();
-  if (dueHours < 10) {
-    dueHours = `0` + dueHours;
-  }
-  if (dueMinutes < 10) {
-    dueMinutes += `0`;
-  }
-
-  return {
-    from: hours + `:` + minutes,
-    due: dueHours + `:` + dueMinutes,
-    duration: diffHrs + `H ` + diffMins
-  };
-};
-
 const types = {
   'taxi': `🚕`,
   'bus': `🚌`,
@@ -57,4 +27,4 @@ const types = {
   'sightseeing': `🏛`,
   // 'Restaurant': `🍴`,
 };
-export {getRandomElement, getRandomNum, shuffleArray, getTime, types};
+export {getRandomElement, getRandomNum, shuffleArray, types};

@@ -3,7 +3,7 @@ import Filter from "./filter/filter";
 import {api} from "./api";
 import moment from "moment";
 import TripDay from "./components/trip-day";
-import {getResultMoney, getResultTransport} from "./statistic";
+// import {getResultMoney, getResultTransport} from "./statistic";
 
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
@@ -89,10 +89,10 @@ const renderPoints = (data) => {
   });
 };
 
-const updateCharts = (points) => {
-  getResultMoney(points);
-  getResultTransport(points);
-};
+// const updateCharts = (points) => {
+//   getResultMoney(points);
+//   getResultTransport(points);
+// };
 
 for (const btn of statBtns) {
   btn.addEventListener(`click`, function (e) {
