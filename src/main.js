@@ -1,5 +1,6 @@
 import PointEdit from './points/point-edit';
 import Filter from "./filter/filter";
+import Sorting from "./sorting/sorting";
 import {api} from "./api";
 import moment from "moment";
 import TripDay from "./components/trip-day";
@@ -7,6 +8,7 @@ import {updateCharts} from "./statistic";
 
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
+const mainSorting = document.querySelector(`.trip-sorting`);
 
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
@@ -24,6 +26,32 @@ const filtersRawData = [
   {name: `past`, id: `filter-past`, isChecked: false},
 ];
 
+const sortingRawData = [
+  {name: `event`, id: `sorting-event`, isChecked: true},
+  {name: `time`, id: `sorting-time`, isChecked: false},
+  {name: `price`, id: `sorting-price`, isChecked: false},
+];
+
+function renderSorting(sortingData) {
+  sortingData.forEach((rawSorting) => {
+    let sorting = new Sorting(rawSorting);
+    mainSorting.appendChild(sorting.render());
+
+    sorting.onSorting = () => {
+      const sortingName = sorting._id;
+      api.getPoints()
+        .then((allPoints) => {
+          const sortedPoints = sortingPoints(allPoints, sortingName);
+          tripPoints.innerHTML = ``;
+          sortPointsByDay(sortedPoints);
+          renderPoints(pointsByDay);
+        });
+    };
+  });
+}
+
+// renderSorting(sortingRawData);
+
 let pointsByDay = new Map();
 const sortPointsByDay = (data) => {
   pointsByDay.clear();
@@ -36,6 +64,19 @@ const sortPointsByDay = (data) => {
   }
   pointsByDay = new Map([...pointsByDay.entries()].sort());
 };
+
+const sortingPoints = (data, sortingName) => {
+  switch (sortingName) {
+    case `sorting-event`:
+      return sortPointsByDay(data);
+    case `sorting-time`:
+      return data.filter((it) => moment(it.date) > moment());
+    case `sorting-price`:
+      return data.filter((it) => moment(it.date) < moment());
+  }
+  return data;
+};
+
 
 const filterPoints = (data, filterName) => {
   switch (filterName) {
