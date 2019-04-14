@@ -3,6 +3,7 @@ import component from '../components/component';
 class Filter extends component {
   constructor(data) {
     super();
+    this._id = data.id;
     this._name = data.name;
     this._isChecked = data.checked;
     this._isDisabled = data.disabled;

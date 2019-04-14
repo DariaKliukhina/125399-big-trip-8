@@ -9,16 +9,54 @@ moneyCtx.height = BAR_HEIGHT * 6;
 transportCtx.height = BAR_HEIGHT * 4;
 timeSpendCtx.height = BAR_HEIGHT * 4;
 
-const getEventsMoney = (events) => {
+let moneyChart;
+let transportChart;
+
+const updateCharts = (points) => {
+  let convertedPoints = [];
+  points.forEach((point) => {
+    convertedPoints.push(...point);
+  });
+
+  const dataChartEventsMoney = getEventsMoney(convertedPoints);
+  const dataChartEventsTransport = getEventsTransport(convertedPoints);
+
+  moneyChart = new Chart(moneyCtx, createDataChart({
+    data: {
+      labels: dataChartEventsMoney.uniqTypes,
+      datasets: [{
+        data: dataChartEventsMoney.data,
+        backgroundColor: `#ffffff`,
+        hoverBackgroundColor: `#ffffff`,
+        anchor: `start`
+      }]
+    }
+  }, `MONEY`, `€`)
+  );
+  transportChart = new Chart(transportCtx, createDataChart({
+    data: {
+      labels: dataChartEventsTransport.transportTypes,
+      datasets: [{
+        data: dataChartEventsTransport.dataTransport,
+        backgroundColor: `#ffffff`,
+        hoverBackgroundColor: `#ffffff`,
+        anchor: `start`
+      }]
+    },
+  }, `TRANSPORT`, ``)
+  );
+};
+
+function getEventsMoney(points) {
   const types = {};
   const data = [];
 
-  for (let event of events) {
-    const prop = `${event.icon} ${event.eventType.toUpperCase()}`;
+  for (let event of points) {
+    const prop = `${event.typeIcon} ${event.type.toUpperCase()}`;
     if (!types.hasOwnProperty(prop)) {
-      types[prop] = event.price;
+      types[prop] = Number(event.price);
     } else {
-      types[prop] += event.price;
+      types[prop] += Number(event.price);
     }
   }
 
@@ -26,16 +64,15 @@ const getEventsMoney = (events) => {
     if (types.hasOwnProperty(prop)) {
       data.push(types[prop]);
     }
-
   }
 
   return {
     uniqTypes: Object.keys(types),
     data
   };
-};
+}
 
-const getEventsTransport = (events) => {
+function getEventsTransport(points) {
   const transportTypes = {};
   const otherTypes = {};
   const dataTransport = [];
@@ -55,15 +92,15 @@ const getEventsTransport = (events) => {
     arr.push(obj[prop]);
   }
 
-  for (let event of events) {
-    switch (event.eventType) {
+  for (let event of points) {
+    switch (event.type.toLowerCase()) {
       case `check-in`:
       case `sightseeing`:
       case `restaurant`:
-        updateTypes(otherTypes, event.icon, event.eventType);
+        updateTypes(otherTypes, event.typeIcon, event.type);
         break;
       default:
-        updateTypes(transportTypes, event.icon, event.eventType);
+        updateTypes(transportTypes, event.typeIcon, event.type);
     }
   }
 
@@ -81,22 +118,20 @@ const getEventsTransport = (events) => {
 
   return {
     transportTypes: Object.keys(transportTypes),
-    otherTypes: Object.keys(transportTypes),
+    otherTypes: Object.keys(otherTypes),
     dataTransport,
     dataOther
   };
-};
+}
 
-const getResultMoney = (result) => {
-  const dataChartEventsMoney = getEventsMoney(result);
-
-  const moneyChart = new Chart(moneyCtx, {
+const createDataChart = (data, titleText, symbol) => {
+  return {
     plugins: [ChartDataLabels],
     type: `horizontalBar`,
     data: {
-      labels: dataChartEventsMoney.uniqTypes,
+      labels: data.data.labels,
       datasets: [{
-        data: dataChartEventsMoney.data,
+        data: data.data.datasets[0].data,
         backgroundColor: `#ffffff`,
         hoverBackgroundColor: `#ffffff`,
         anchor: `start`
@@ -111,12 +146,12 @@ const getResultMoney = (result) => {
           color: `#000000`,
           anchor: `end`,
           align: `start`,
-          formatter: (val) => `€ ${val}`
+          formatter: (val) => `${symbol} ${val}`
         }
       },
       title: {
         display: true,
-        text: `MONEY`,
+        text: titleText,
         fontColor: `#000000`,
         fontSize: 23,
         position: `left`
@@ -153,77 +188,8 @@ const getResultMoney = (result) => {
         enabled: false,
       }
     }
-  });
-  return moneyChart;
-};
-const getResultTransport = (result) => {
-  const dataChartEventsTransport = getEventsTransport(result);
-  const transportChart = new Chart(transportCtx, {
-    plugins: [ChartDataLabels],
-    type: `horizontalBar`,
-    data: {
-      labels: dataChartEventsTransport.transportTypes,
-      datasets: [{
-        data: dataChartEventsTransport.dataTransport,
-        backgroundColor: `#ffffff`,
-        hoverBackgroundColor: `#ffffff`,
-        anchor: `start`
-      }]
-    },
-    options: {
-      plugins: {
-        datalabels: {
-          font: {
-            size: 13
-          },
-          color: `#000000`,
-          anchor: `end`,
-          align: `start`,
-          formatter: (val) => `${val}x`
-        }
-      },
-      title: {
-        display: true,
-        text: `TRANSPORT`,
-        fontColor: `#000000`,
-        fontSize: 23,
-        position: `left`
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            fontColor: `#000000`,
-            padding: 5,
-            fontSize: 13,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-          barThickness: 44,
-        }],
-        xAxes: [{
-          ticks: {
-            display: false,
-            beginAtZero: true,
-          },
-          gridLines: {
-            display: false,
-            drawBorder: false
-          },
-          minBarLength: 50
-        }],
-      },
-      legend: {
-        display: false
-      },
-      tooltips: {
-        enabled: false,
-      }
-    }
-  });
-  return transportChart;
+  };
 };
 
-export {getResultMoney, getResultTransport};
+export {updateCharts, moneyChart, transportChart};
 
