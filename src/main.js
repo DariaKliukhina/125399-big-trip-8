@@ -3,19 +3,13 @@ import Filter from "./filter/filter";
 import {api} from "./api";
 import moment from "moment";
 import TripDay from "./components/trip-day";
-// import {getResultMoney, getResultTransport} from "./statistic";
+import {updateCharts} from "./statistic";
 
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
 
-// const tableButton = document.querySelector(`.view-switch__item:nth-child(1)`);
-// const statsButton = document.querySelector(`.view-switch__item:nth-child(2)`);
-
-
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
-// const tripForm = document.querySelector(`.trip-filter`);
-// const tripDay = document.querySelector(`.trip-day__items`);
 
 const statBtns = document.querySelectorAll(`.view-switch__item`);
 const pointsContainer = document.querySelector(`.main`);
@@ -89,11 +83,6 @@ const renderPoints = (data) => {
   });
 };
 
-// const updateCharts = (points) => {
-//   getResultMoney(points);
-//   getResultTransport(points);
-// };
-
 for (const btn of statBtns) {
   btn.addEventListener(`click`, function (e) {
     e.preventDefault();
@@ -107,7 +96,7 @@ for (const btn of statBtns) {
 
     const targetContainer = document.querySelector(`#${target}`);
     targetContainer.classList.remove(HIDDEN_CLASS);
-    // updateCharts(pointsByDay);
+    updateCharts(pointsByDay);
   });
 }
 
