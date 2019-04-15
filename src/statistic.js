@@ -7,10 +7,11 @@ const timeSpendCtx = document.querySelector(`.statistic__time-spend`);
 const BAR_HEIGHT = 55;
 moneyCtx.height = BAR_HEIGHT * 6;
 transportCtx.height = BAR_HEIGHT * 4;
-timeSpendCtx.height = BAR_HEIGHT * 4;
+timeSpendCtx.height = BAR_HEIGHT * 6;
 
 let moneyChart;
 let transportChart;
+let timeChart;
 
 const updateCharts = (points) => {
   let convertedPoints = [];
@@ -19,6 +20,7 @@ const updateCharts = (points) => {
   });
 
   const dataChartEventsMoney = getEventsMoney(convertedPoints);
+  const dataChartEventsTime = getEventsTime(convertedPoints);
   const dataChartEventsTransport = getEventsTransport(convertedPoints);
 
   moneyChart = new Chart(moneyCtx, createDataChart({
@@ -33,6 +35,17 @@ const updateCharts = (points) => {
     }
   }, `MONEY`, `€`)
   );
+  timeChart = new Chart(timeSpendCtx, createDataChart({
+    data: {
+      labels: dataChartEventsTime.uniqTypes,
+      datasets: [{
+        data: dataChartEventsTime.data,
+        backgroundColor: `#ffffff`,
+        hoverBackgroundColor: `#ffffff`,
+        anchor: `start`
+      }]
+    }
+  }, `TIME`, `H`));
   transportChart = new Chart(transportCtx, createDataChart({
     data: {
       labels: dataChartEventsTransport.transportTypes,
@@ -63,6 +76,32 @@ function getEventsMoney(points) {
   for (let prop in types) {
     if (types.hasOwnProperty(prop)) {
       data.push(types[prop]);
+    }
+  }
+
+  return {
+    uniqTypes: Object.keys(types),
+    data
+  };
+}
+
+function getEventsTime(points) {
+  const types = {};
+  const data = [];
+
+  for (let event of points) {
+    const prop = `${event.typeIcon} ${event.type.toUpperCase()}`;
+    if (!types.hasOwnProperty(prop)) {
+      types[prop] = Number(event.duration);
+    } else {
+      types[prop] += Number(event.duration);
+    }
+  }
+
+  for (let prop in types) {
+    if (types.hasOwnProperty(prop)) {
+      let convertedTime = Math.floor(types[prop] / 3600000);
+      data.push(convertedTime);
     }
   }
 
@@ -191,5 +230,5 @@ const createDataChart = (data, titleText, symbol) => {
   };
 };
 
-export {updateCharts, moneyChart, transportChart};
+export {updateCharts, moneyChart, transportChart, timeChart};
 
