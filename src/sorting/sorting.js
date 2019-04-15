@@ -7,7 +7,7 @@ class Sorting extends component {
     this._name = data.name;
     this._isChecked = data.checked;
     this._onSorting = null;
-    this._onFilterClick = this._onSortingClick.bind(this);
+    this._onSortingClick = this._onSortingClick.bind(this);
   }
   set onSorting(fn) {
     this._onSorting = fn;

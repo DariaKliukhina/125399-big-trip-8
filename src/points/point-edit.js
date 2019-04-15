@@ -263,9 +263,6 @@ class PointEdit extends component {
 
     this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormDelete);
 
-    this._element.querySelector(`.point__offers-input`)
-      .removeEventListener(`change`, this._onOfferChange);
-
     this._element.querySelector(`.point__destination-input`)
       .removeEventListener(`change`, this._onChangeDestination);
 

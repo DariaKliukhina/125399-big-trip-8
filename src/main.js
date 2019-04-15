@@ -39,14 +39,9 @@ function renderSorting(sortingData) {
     mainSorting.insertBefore(sorting.render(), offersBlock);
 
     sorting.onSorting = () => {
-      const sortingName = sorting._id;
-      api.getPoints()
-        .then((allPoints) => {
-          const sortedPoints = sortingPoints(allPoints, sortingName);
-          tripPoints.innerHTML = ``;
-          sortPointsByDay(sortedPoints);
-          renderPoints(pointsByDay);
-        });
+      const sortedPoints = sortingPoints(pointsByDay, sorting._id);
+      tripPoints.innerHTML = ``;
+      renderPoints(sortedPoints);
     };
   });
 }
@@ -63,21 +58,76 @@ const sortPointsByDay = (data) => {
       pointsByDay.get(point.uniqueDay).push(point);
     }
   }
+
   pointsByDay = new Map([...pointsByDay.entries()].sort());
 };
 
 const sortingPoints = (data, sortingName) => {
   switch (sortingName) {
     case `sorting-event`:
-      return sortPointsByDay(data);
+      return sortingByEventName(data);
     case `sorting-time`:
-      return data.filter((it) => moment(it.date) > moment());
+      return sortingByTime(data);
     case `sorting-price`:
-      return data.filter((it) => moment(it.date) < moment());
+      return sortingByPrice(data);
   }
   return data;
 };
 
+function sortingByTime(data) {
+  data.forEach((day) => {
+    if (day.length > 1) {
+      day.sort(function (a, b) {
+        if (a.duration > b.duration) {
+          return 1;
+        }
+        if (a.duration < b.duration) {
+          return -1;
+        }
+        return 0;
+      });
+    }
+  });
+
+  return data;
+}
+
+
+function sortingByEventName(data) {
+  data.forEach((day) => {
+    if (day.length > 1) {
+      day.sort(function (a, b) {
+        if (a.type > b.type) {
+          return 1;
+        }
+        if (a.type < b.type) {
+          return -1;
+        }
+        return 0;
+      });
+    }
+  });
+
+  return data;
+}
+
+function sortingByPrice(data) {
+  data.forEach((day) => {
+    if (day.length > 1) {
+      day.sort(function (a, b) {
+        if (a.price > b.price) {
+          return 1;
+        }
+        if (a.price < b.price) {
+          return -1;
+        }
+        return 0;
+      });
+    }
+  });
+
+  return data;
+}
 
 const filterPoints = (data, filterName) => {
   switch (filterName) {

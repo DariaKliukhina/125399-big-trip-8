@@ -13,6 +13,8 @@ class TripDay {
     this._recentlyDeletedId = null;
     this._element = null;
     this._onDelete = null;
+
+
   }
 
   _createElement(template) {
@@ -85,11 +87,10 @@ class TripDay {
       };
 
       pointEdit.onEsc = (initialObject) => {
-        const tripDay = document.querySelector(`.trip-day__items`);
         point.price = initialObject.price;
         pointEdit.update(pointData);
         point.render();
-        tripDay.replaceChild(point.element, pointEdit.element);
+        this._dayElements.replaceChild(point.element, pointEdit.element);
         pointEdit.unrender();
       };
 
