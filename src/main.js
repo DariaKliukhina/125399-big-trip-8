@@ -50,7 +50,7 @@ function renderSorting(sortingData) {
   });
 }
 
-// renderSorting(sortingRawData);
+renderSorting(sortingRawData);
 
 let pointsByDay = new Map();
 const sortPointsByDay = (data) => {
