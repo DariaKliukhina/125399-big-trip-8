@@ -9,6 +9,7 @@ import {updateCharts} from "./statistic";
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
 const mainSorting = document.querySelector(`.trip-sorting`);
+const offersBlock = document.querySelector(`.trip-sorting__item--offers`);
 
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
@@ -21,21 +22,21 @@ const closeAllContainer = () => allContainers.forEach((it) => it.classList.add(H
 
 
 const filtersRawData = [
-  {name: `everything`, id: `filter-everything`, isChecked: true},
-  {name: `future`, id: `filter-future`, isChecked: false},
-  {name: `past`, id: `filter-past`, isChecked: false},
+  {name: `everything`, id: `filter-everything`, checked: true},
+  {name: `future`, id: `filter-future`, checked: false},
+  {name: `past`, id: `filter-past`, checked: false},
 ];
 
 const sortingRawData = [
-  {name: `event`, id: `sorting-event`, isChecked: true},
-  {name: `time`, id: `sorting-time`, isChecked: false},
-  {name: `price`, id: `sorting-price`, isChecked: false},
+  {name: `event`, id: `sorting-event`, checked: true},
+  {name: `time`, id: `sorting-time`, checked: false},
+  {name: `price`, id: `sorting-price`, checked: false},
 ];
 
 function renderSorting(sortingData) {
   sortingData.forEach((rawSorting) => {
     let sorting = new Sorting(rawSorting);
-    mainSorting.appendChild(sorting.render());
+    mainSorting.insertBefore(sorting.render(), offersBlock);
 
     sorting.onSorting = () => {
       const sortingName = sorting._id;
