@@ -63,25 +63,30 @@ const sortPointsByDay = (data) => {
 };
 
 const sortingPoints = (data, sortingName) => {
+  let sortingParameter;
   switch (sortingName) {
     case `sorting-event`:
-      return sortingByEventName(data);
+      sortingParameter = `type`;
+      break;
     case `sorting-time`:
-      return sortingByTime(data);
+      sortingParameter = `duration`;
+      break;
     case `sorting-price`:
-      return sortingByPrice(data);
+      sortingParameter = `price`;
+      break;
   }
-  return data;
+
+  return pointSorting(data, sortingParameter);
 };
 
-function sortingByTime(data) {
+const pointSorting = (data, parameter) => {
   data.forEach((day) => {
     if (day.length > 1) {
       day.sort(function (a, b) {
-        if (a.duration > b.duration) {
+        if (a[parameter] > b[parameter]) {
           return 1;
         }
-        if (a.duration < b.duration) {
+        if (a[parameter] < b[parameter]) {
           return -1;
         }
         return 0;
@@ -90,44 +95,7 @@ function sortingByTime(data) {
   });
 
   return data;
-}
-
-
-function sortingByEventName(data) {
-  data.forEach((day) => {
-    if (day.length > 1) {
-      day.sort(function (a, b) {
-        if (a.type > b.type) {
-          return 1;
-        }
-        if (a.type < b.type) {
-          return -1;
-        }
-        return 0;
-      });
-    }
-  });
-
-  return data;
-}
-
-function sortingByPrice(data) {
-  data.forEach((day) => {
-    if (day.length > 1) {
-      day.sort(function (a, b) {
-        if (a.price > b.price) {
-          return 1;
-        }
-        if (a.price < b.price) {
-          return -1;
-        }
-        return 0;
-      });
-    }
-  });
-
-  return data;
-}
+};
 
 const filterPoints = (data, filterName) => {
   switch (filterName) {

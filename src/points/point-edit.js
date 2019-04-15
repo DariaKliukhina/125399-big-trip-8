@@ -413,7 +413,7 @@ class PointEdit extends component {
                     ${this._description}
                   </p>
                   <div class="point__destination-images">
-                    <${this._picture.map((pic) =>` <img src="${pic.src}" alt="${pic.description}" class="point__destination-image">`).join(``).trim()}
+                    ${this._picture.map((pic) =>` <img src="${pic.src}" alt="${pic.description}" class="point__destination-image">`).join(``).trim()}
                     </div>
                   </section>
                   <input type="hidden" class="point__total-price" name="total-price" value="">
