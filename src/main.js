@@ -170,6 +170,7 @@ tripPoints.appendChild(msg);
 
 Promise.all([api.getPoints(), api.getDestinations(), api.getOffers()])
   .then(([pointsData, destinations, offers]) => {
+  console.log(pointsData);
     tripPoints.removeChild(msg);
     PointEdit.setDestinations(destinations);
     PointEdit.setAllOffers(offers);

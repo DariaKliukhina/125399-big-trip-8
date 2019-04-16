@@ -26,7 +26,7 @@ const getTime = (date, dateDue) => {
     hours = `0` + hours;
   }
   if (minutes < 10) {
-    minutes += `0`;
+    minutes = `0` + minutes;
   }
 
   let dueHours = dateDue.getHours();
@@ -35,7 +35,7 @@ const getTime = (date, dateDue) => {
     dueHours = `0` + dueHours;
   }
   if (dueMinutes < 10) {
-    dueMinutes += `0`;
+    dueMinutes = `0` + dueMinutes;
   }
 
   return {
