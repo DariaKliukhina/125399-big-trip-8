@@ -23,6 +23,12 @@ const updateCharts = (points) => {
   const dataChartEventsTime = getEventsTime(convertedPoints);
   const dataChartEventsTransport = getEventsTransport(convertedPoints);
 
+  if (moneyChart && transportChart && timeChart) {
+    moneyChart.destroy();
+    transportChart.destroy();
+    timeChart.destroy();
+  }
+
   moneyChart = new Chart(moneyCtx, createDataChart({
     data: {
       labels: dataChartEventsMoney.uniqTypes,

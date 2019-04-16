@@ -15,7 +15,10 @@ class PointEdit extends component {
     this._typeIcon = data.typeIcon;
     this._price = data.price;
     this._description = data.description;
+    this._day = data.day;
+    this._month = data.month;
     this._date = data.date;
+    this._dateDue = data.dateDue;
     this._time = data.time;
     this._offers = data.offers;
     this._startPrice = data.price;
@@ -93,7 +96,7 @@ class PointEdit extends component {
   _onSubmitButtonClick(e) {
     e.preventDefault();
 
-    const formData = new FormData(this._element.querySelector(`.trip-day__items form`));
+    const formData = new FormData(this._element.querySelector(`.point > form`));
     const newData = this._processForm(formData);
     if (typeof this._onSubmit === `function`) {
       this._onSubmit(newData);
@@ -176,6 +179,8 @@ class PointEdit extends component {
       this._picture = newDestination.pictures;
       this._partialUpdate();
     }
+
+    this.bind();
   }
 
   set onSubmit(fn) {
@@ -214,8 +219,8 @@ class PointEdit extends component {
   }
 
   bind() {
-    const dateStart = this.element.querySelector(`input[name="date-start"]`);
-    const dateEnd = this.element.querySelector(`input[name="date-end"]`);
+    const dateStart = this.element.querySelector(`.point__time input[name="date-start"]`);
+    const dateEnd = this.element.querySelector(`.point__time input[name="date-end"]`);
 
     this._element.addEventListener(`submit`, this._onSubmitButtonClick);
 
@@ -299,19 +304,19 @@ class PointEdit extends component {
 
   static createMapper(target) {
     return {
-      price: (value) => {
+      'price': (value) => {
         target.price = value;
       },
-      destination: (value) => {
+      'destination': (value) => {
         target.city = value;
       },
-      favorite: () => {
+      'favorite': () => {
         target.isFavorite = true;
       },
-      time: (value) => {
+      'time': (value) => {
         target.time = value;
       },
-      icon: (value) => {
+      'icon': (value) => {
         target.icon = value;
       }
     };
@@ -323,7 +328,7 @@ class PointEdit extends component {
             <header class="point__header">
               <label class="point__date">
                 choose day
-                <input class="point__input" type="text" placeholder="MAR 18" name="day">
+                <input class="point__input" type="text" placeholder="${this.date.month}" value="${this.date.month}" name="day">
               </label>
         
               <div class="travel-way">
@@ -379,7 +384,7 @@ class PointEdit extends component {
                 <label class="point__price">
                   write price
                   <span class="point__price-currency">€</span>
-                  <input class="point__input" type="text" value="${this._price}" name="price" readonly>
+                  <input class="point__input" type="text" value="${this._price}" name="price">
               </label>
         
               <div class="point__buttons">

@@ -4,12 +4,14 @@ import Sorting from "./sorting/sorting";
 import {api} from "./api";
 import moment from "moment";
 import TripDay from "./components/trip-day";
+import ModelPoint from "./points-adapter";
 import {updateCharts} from "./statistic";
 
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
 const mainSorting = document.querySelector(`.trip-sorting`);
 const offersBlock = document.querySelector(`.trip-sorting__item--offers`);
+const newTask = document.querySelector(`.new-event`);
 
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
@@ -129,6 +131,7 @@ function renderFilters(filtersData) {
 
 
 const renderPoints = (data) => {
+  tripPoints.innerHTML = ``;
   data.forEach((dayPoints) => {
     let day = new TripDay(dayPoints);
     tripPoints.appendChild(day.render());
@@ -142,6 +145,55 @@ const renderPoints = (data) => {
     };
   });
 };
+
+newTask.addEventListener(`click`, () => {
+  const newPoint = {
+    'id': String(Date.now()),
+    'date_from': new Date(),
+    'date_to': new Date(),
+    'destination': {
+      name: ``,
+      description: ``,
+      pictures: []
+    },
+    'base_price': 0,
+    'is_favorite': false,
+    'offers': [],
+    'type': `bus`,
+  };
+
+  const point = new ModelPoint(newPoint);
+  const pointEdit = new PointEdit(point);
+
+  pointEdit.onSubmit = (newObject) => {
+    newPoint.destination = {
+      name: newObject.city,
+      description: newObject.description,
+      pictures: newObject.picture
+    };
+    newPoint.type = newObject.type.toLowerCase();
+    newPoint.offers = newObject.offers;
+    newPoint[`is_favorite`] = newObject.isFavorite;
+    newPoint[`base_price`] = newObject.price;
+    newPoint[`date_from`] = newObject.date.getTime();
+    newPoint[`date_to`] = newObject.dateDue.getTime();
+
+    const obj = ModelPoint.parsePoint(newPoint).toRAW();
+    // api.createPoint(obj)
+    //   .then();
+
+    api.getPoints()
+      .then((points) => {
+        sortPointsByDay(points);
+        renderPoints(pointsByDay);
+      });
+  };
+  pointEdit.onDelete = () => {
+    pointEdit.unrender();
+  };
+
+  tripPoints.insertBefore(pointEdit.render(), tripPoints.firstChild);
+});
 
 for (const btn of statBtns) {
   btn.addEventListener(`click`, function (e) {
@@ -170,7 +222,6 @@ tripPoints.appendChild(msg);
 
 Promise.all([api.getPoints(), api.getDestinations(), api.getOffers()])
   .then(([pointsData, destinations, offers]) => {
-  console.log(pointsData);
     tripPoints.removeChild(msg);
     PointEdit.setDestinations(destinations);
     PointEdit.setAllOffers(offers);
