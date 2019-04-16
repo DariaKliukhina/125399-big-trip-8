@@ -13,7 +13,7 @@ class TripDay {
     this._recentlyDeletedId = null;
     this._element = null;
     this._onDelete = null;
-
+    this._onSubmit = null;
 
   }
 
@@ -58,6 +58,7 @@ class TripDay {
         pointData.offers = newObject.offers;
         pointData.date = newObject.date;
         pointData.dateDue = newObject.dateDue;
+        pointData.isFavorite = newObject.dateDue;
 
         const block = () => {
           pointEdit.element.querySelector(`.point__button--save`).innerText = `Saving...`;

@@ -19,7 +19,7 @@ class PointEdit extends component {
     this._time = data.time;
     this._offers = data.offers;
     this._startPrice = data.price;
-    this._isFavorite = false;
+    this._isFavorite = data.isFavorite;
 
     this._element = null;
     this._onSubmit = null;
@@ -111,14 +111,12 @@ class PointEdit extends component {
   _onCheckedChange(e) {
     for (let offer of this._offers) {
       if (e.target.id === offer.title.split(` `).join(`-`).toLocaleLowerCase()) {
-        offer.checked = e.currentTarget.checked;
+        offer.accepted = e.currentTarget.checked;
       }
     }
   }
   _onFavoriteChange() {
-    this.isFavourite = !this.isFavourite;
-    this.unbind();
-    this.bind();
+    this.isFavorite = !this.isFavorite;
   }
 
   _onEventChange(e) {
@@ -126,7 +124,11 @@ class PointEdit extends component {
 
     this._type = typeName;
     this._typeIcon = types[typeName];
-    this._price = this._startPrice;
+    for (const offer of this._offers) {
+      if (offer.accepted) {
+        this._price -= offer.price;
+      }
+    }
 
     PointEdit._allOffersData.forEach((offersByType) => {
       if (offersByType.type === typeName) {
@@ -263,6 +265,9 @@ class PointEdit extends component {
 
     this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormDelete);
 
+    this._element.querySelector(`#favorite`)
+      .removeEventListener(`change`, this._onFavoriteChange);
+
     this._element.querySelector(`.point__destination-input`)
       .removeEventListener(`change`, this._onChangeDestination);
 
@@ -398,7 +403,7 @@ class PointEdit extends component {
                                  type="checkbox" 
                                  id="${offer.title.split(` `).join(`-`).toLocaleLowerCase()}" 
                                  name="offer" 
-                                 value="${offer.price}" ${offer.checked ? `checked` : ``}
+                                 value="${offer.price}" ${offer.accepted ? `checked` : ``}
                                   >
                           <label for="${offer.title.split(` `).join(`-`).toLocaleLowerCase()}" class="point__offers-label">
                             <span class="point__offer-service">${offer.title}</span> + €<span class="point__offer-price">${offer.price}</span>
