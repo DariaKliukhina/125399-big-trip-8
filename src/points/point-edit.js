@@ -17,11 +17,15 @@ class PointEdit extends component {
     this._description = data.description;
     this._day = data.day;
     this._month = data.month;
+    this._year = data.year;
     this._date = data.date;
     this._dateDue = data.dateDue;
     this._time = data.time;
     this._offers = data.offers;
-    this._startPrice = data.price;
+    this._startObject = {
+      price: data.price,
+      offers: data.offers.map((a) => Object.assign({}, a)),
+    };
     this._isFavorite = data.isFavorite;
 
     this._element = null;
@@ -87,10 +91,8 @@ class PointEdit extends component {
     const ESC = 27;
     if (e.keyCode === ESC) {
       if (typeof this._onEsc === `function`) {
-        const initData = {
-          price: this._startPrice
-        };
-        this._onEsc(initData);
+        this._onEsc(this._startObject);
+        this._offers = this._startObject.offers.map((a) => Object.assign({}, a));
       }
     }
   }
@@ -130,7 +132,8 @@ class PointEdit extends component {
       case `day`:
         this._day = currentValue.split(` `)[0];
         this._month = currentValue.split(` `)[1];
-        this._date = currentValue;
+        let year = currentValue.split(` `)[2];
+        this._date = new Date(`${this._day}, ${this._month}, ${year}`);
         break;
       case `price`:
         this._price = currentValue;
@@ -155,6 +158,7 @@ class PointEdit extends component {
     PointEdit._allOffersData.forEach((offersByType) => {
       if (offersByType.type === typeName) {
         this._offers = this._convertOffers(offersByType.offers);
+        this._startObject.offers = this._offers.map((a) => Object.assign({}, a));
       }
     });
 

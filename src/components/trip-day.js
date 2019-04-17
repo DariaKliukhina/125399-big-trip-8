@@ -88,7 +88,8 @@ class TripDay {
       };
 
       pointEdit.onEsc = (initialObject) => {
-        point.price = initialObject.price;
+        point._price = initialObject.price;
+        point._offers = initialObject.offers;
         pointEdit.update(pointData);
         point.render();
         this._dayElements.replaceChild(point.element, pointEdit.element);

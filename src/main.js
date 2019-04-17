@@ -211,7 +211,7 @@ for (const btn of statBtns) {
     updateCharts(pointsByDay);
   });
 }
-
+console.log(new Date(`Apr 15, 1990`));
 
 renderFilters(filtersRawData);
 
