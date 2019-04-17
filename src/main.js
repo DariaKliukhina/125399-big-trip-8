@@ -6,12 +6,14 @@ import moment from "moment";
 import TripDay from "./components/trip-day";
 import ModelPoint from "./points-adapter";
 import {updateCharts} from "./statistic";
+import TotalPrice from './components/total-price';
 
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
 const mainSorting = document.querySelector(`.trip-sorting`);
 const offersBlock = document.querySelector(`.trip-sorting__item--offers`);
 const newTask = document.querySelector(`.new-event`);
+const totalPriceContainer = document.querySelector(`.trip__total`);
 
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
@@ -132,10 +134,10 @@ function renderFilters(filtersData) {
 
 const renderPoints = (data) => {
   tripPoints.innerHTML = ``;
+  setTotalPrice(data);
   data.forEach((dayPoints) => {
     let day = new TripDay(dayPoints);
     tripPoints.appendChild(day.render());
-
     day.onDelete = () => {
       api.getPoints()
         .then((remainPoints) => {
@@ -185,6 +187,7 @@ newTask.addEventListener(`click`, () => {
     api.getPoints()
       .then((points) => {
         sortPointsByDay(points);
+        setTotalPrice(points);
         renderPoints(pointsByDay);
       });
   };
@@ -211,8 +214,14 @@ for (const btn of statBtns) {
     updateCharts(pointsByDay);
   });
 }
-console.log(new Date(`Apr 15, 1990`));
 
+
+const setTotalPrice = (points) => {
+  totalPriceContainer.innerHTML = ``;
+  const newTotalPriceComponent = new TotalPrice();
+  newTotalPriceComponent.getPrice(points);
+  totalPriceContainer.appendChild(newTotalPriceComponent.render());
+};
 renderFilters(filtersRawData);
 
 let msg = document.createElement(`div`);
