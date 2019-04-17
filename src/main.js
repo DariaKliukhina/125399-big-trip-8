@@ -179,8 +179,8 @@ newTask.addEventListener(`click`, () => {
     newPoint[`date_to`] = newObject.dateDue.getTime();
 
     const obj = ModelPoint.parsePoint(newPoint).toRAW();
-    // api.createPoint(obj)
-    //   .then();
+    api.createPoint({point: obj})
+      .then();
 
     api.getPoints()
       .then((points) => {

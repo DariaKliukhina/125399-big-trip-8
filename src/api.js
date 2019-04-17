@@ -1,6 +1,6 @@
 import ModelPoint from './points-adapter';
 
-const AUTHORIZATION = `Basic eo0w590ik2989090a`;
+const AUTHORIZATION = `Basic eo0w59ddd2779090a`;
 const END_POINT = `https://es8-demo-srv.appspot.com/big-trip`;
 
 const Method = {

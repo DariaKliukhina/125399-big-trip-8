@@ -2,6 +2,7 @@ import {getTime, getDuration} from './utils/helpers';
 
 class ModelPoint {
   constructor(data) {
+    console.log(data, 'data');
     this.id = data[`id`];
     this.city = data[`destination`][`name`];
     this.type = ModelPoint.getTypeData(data[`type`]).name;
