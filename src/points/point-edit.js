@@ -31,6 +31,7 @@ class PointEdit extends component {
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onFormDelete = this._onFormDelete.bind(this);
     this._onFavoriteChange = this._onFavoriteChange.bind(this);
+    this._onInputsChange = this._onInputsChange.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
     this._onEventChange = this._onEventChange.bind(this);
     this._onOfferChange = this._onOfferChange.bind(this);
@@ -85,11 +86,12 @@ class PointEdit extends component {
   _onKeyDown(e) {
     const ESC = 27;
     if (e.keyCode === ESC) {
-      const initData = {
-        price: this._startPrice
-      };
-
-      this._onEsc(initData);
+      if (typeof this._onEsc === `function`) {
+        const initData = {
+          price: this._startPrice
+        };
+        this._onEsc(initData);
+      }
     }
   }
 
@@ -117,6 +119,22 @@ class PointEdit extends component {
       if (e.target.id === offer.title.split(` `).join(`-`).toLocaleLowerCase()) {
         offer.accepted = e.currentTarget.checked;
       }
+    }
+  }
+
+  _onInputsChange(e) {
+    let currentName = e.target.name;
+    let currentValue = e.target.value;
+
+    switch (currentName) {
+      case `day`:
+        this._day = currentValue.split(` `)[0];
+        this._month = currentValue.split(` `)[1];
+        this._date = currentValue;
+        break;
+      case `price`:
+        this._price = currentValue;
+        break;
     }
   }
   _onFavoriteChange() {
@@ -205,6 +223,11 @@ class PointEdit extends component {
     for (let i = 0; i < travelSelect.length; i++) {
       travelSelect[i].addEventListener(`click`, this._onEventChange);
     }
+
+    const inputs = this.element.querySelectorAll(`.point__header input[type="text"]`);
+    for (let i = 0; i < inputs.length; i++) {
+      inputs[i].addEventListener(`change`, this._onInputsChange);
+    }
   }
 
   _removeCycleListeners() {
@@ -217,20 +240,26 @@ class PointEdit extends component {
     for (let i = 0; i < travelSelect.length; i++) {
       travelSelect[i].removeEventListener(`click`, this._onEventChange);
     }
+
+    const inputs = this.element.querySelector(`input[type="text"]`);
+    for (let i = 0; i < inputs.length; i++) {
+      inputs[i].removeEventListener(`change`, this._onInputsChange);
+    }
   }
 
   bind() {
     const dateStart = this.element.querySelector(`.point__time input[name="date-start"]`);
     const dateEnd = this.element.querySelector(`.point__time input[name="date-end"]`);
+    const form = this.element.querySelector(`form`);
 
-    this._element.addEventListener(`submit`, this._onSubmitButtonClick);
+    form.addEventListener(`submit`, this._onSubmitButtonClick);
 
     document.addEventListener(`keydown`, this._onKeyDown);
 
     this._element.querySelector(`#favorite`)
       .addEventListener(`change`, this._onFavoriteChange);
 
-    this._element.querySelector(`form`).addEventListener(`reset`, this._onFormDelete);
+    form.addEventListener(`reset`, this._onFormDelete);
 
     this._element.querySelector(`.point__destination-input`)
       .addEventListener(`change`, this._onChangeDestination);
@@ -319,6 +348,9 @@ class PointEdit extends component {
       },
       'icon': (value) => {
         target.icon = value;
+      },
+      'day': (value) => {
+        target.day = value;
       }
     };
   }
@@ -329,7 +361,7 @@ class PointEdit extends component {
             <header class="point__header">
               <label class="point__date">
                 choose day
-                <input class="point__input" type="text" placeholder="${this.date.month}" value="${this.date.month}" name="day">
+                <input class="point__input" type="text" placeholder="${this.date.day} ${this.date.month}" value="${this.date.day} ${this.date.month}" name="day">
               </label>
 
               <div class="travel-way">

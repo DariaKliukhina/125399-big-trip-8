@@ -2,7 +2,6 @@ import {getTime, getDuration} from './utils/helpers';
 
 class ModelPoint {
   constructor(data) {
-    console.log(data, 'data');
     this.id = data[`id`];
     this.city = data[`destination`][`name`];
     this.type = ModelPoint.getTypeData(data[`type`]).name;
@@ -12,7 +11,7 @@ class ModelPoint {
     this.price = data[`base_price`];
     this.offers = data[`offers`];
     this.day = this._formatNewDate(data[`date_from`]).tripDay;
-    this.month = this._formatNewDate(data[`date_from`]).tripMonth + ` ` + this._formatNewDate(data[`date_from`]).tripYear;
+    this.month = this._formatNewDate(data[`date_from`]).tripMonth;
     this.uniqueDay = this._formatNewDate(data[`date_from`]).uniqueDay;
     this.date = new Date(data[`date_from`]);
     this.dateDue = new Date(data[`date_to`]);
