@@ -394,6 +394,7 @@ class PointEdit extends component {
 
     flatpickr(dateStart, {
       'defaultDate': [this._date],
+      'minDate': this._date,
       'enableTime': true,
       'time_24hr': true,
       'dateFormat': `H:i`,
@@ -408,6 +409,7 @@ class PointEdit extends component {
     flatpickr(dateEnd, {
       'defaultDate': [this._dateDue],
       'enableTime': true,
+      'minDate': this._date,
       'time_24hr': true,
       'dateFormat': `H:i`,
       'onChange': (selectedDates) => {
