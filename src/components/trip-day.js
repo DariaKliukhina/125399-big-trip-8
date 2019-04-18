@@ -18,10 +18,25 @@ class TripDay {
 
   }
 
-  _createElement(template) {
-    const newElement = document.createElement(`div`);
-    newElement.innerHTML = template;
-    return newElement.firstChild;
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
+
+  get element() {
+    return this._element;
+  }
+
+  get template() {
+    return `
+    <section class="trip-day">
+      <article class="trip-day__info">
+        <span class="trip-day__caption">Day</span>
+        <p class="trip-day__number">${this._day}</p>
+        <h2 class="trip-day__title">${this._month}</h2>
+      </article>
+      <div class="trip-day__items">
+      </div>
+    </section>`.trim();
   }
 
   render() {
@@ -34,7 +49,11 @@ class TripDay {
     });
     return this._element;
   }
-
+  _createElement(template) {
+    const newElement = document.createElement(`div`);
+    newElement.innerHTML = template;
+    return newElement.firstChild;
+  }
   build() {
     this._pointsData.forEach((pointData, i) => {
       let point = new Point(pointData);
@@ -93,13 +112,12 @@ class TripDay {
             pointEdit.element.classList.add(`point--error`);
             unblock();
           });
-
-
       };
 
       pointEdit.onEsc = (initialObject) => {
         point._price = initialObject.price;
         point._offers = initialObject.offers;
+        point._isFavorite = initialObject.isFavorite;
         pointEdit.update(pointData);
         point.render();
         this._dayElements.replaceChild(point.element, pointEdit.element);
@@ -137,30 +155,8 @@ class TripDay {
       };
     });
   }
-
   unrender() {
     this._element = null;
-  }
-
-  set onDelete(fn) {
-    this._onDelete = fn;
-  }
-
-  get element() {
-    return this._element;
-  }
-
-  get template() {
-    return `
-    <section class="trip-day">
-      <article class="trip-day__info">
-        <span class="trip-day__caption">Day</span>
-        <p class="trip-day__number">${this._day}</p>
-        <h2 class="trip-day__title">${this._month}</h2>
-      </article>
-      <div class="trip-day__items">
-      </div>
-    </section>`.trim();
   }
 }
 

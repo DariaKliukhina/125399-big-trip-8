@@ -1,4 +1,4 @@
-import TotaCost from '../components/total-price';
+import TotalCost from '../components/total-price';
 
 const getRandomNum = (count) => {
   return Math.floor(Math.random() * count);
@@ -54,20 +54,20 @@ const types = {
   'bus': `🚌`,
   'train': `🚂`,
   'ship': `🛳️`,
-  // 'Transport': `🚊`,
+  'Transport': `🚊`,
   'drive': `🚗`,
   'flight': `✈️`,
   'check-in': `🏨`,
   'sightseeing': `🏛`,
-  // 'Restaurant': `🍴`,
+  'Restaurant': `🍴`,
 };
 
 const setTotalCost = (points, container) => {
   container.innerHTML = ``;
-  const newTotaCostComponent = new TotaCost();
+  const newTotalCostComponent = new TotalCost();
 
-  newTotaCostComponent.getPrice(points);
-  container.appendChild(newTotaCostComponent.render());
+  newTotalCostComponent.getPrice(points);
+  container.appendChild(newTotalCostComponent.render());
 
 };
 

@@ -12,15 +12,13 @@ class Sorting extends component {
   set onSorting(fn) {
     this._onSorting = fn;
   }
-
-  _onSortingClick() {
-    return typeof this._onSorting === `function` && this._onSorting();
-  }
-
   get template() {
     return `<span class="sorting-wrap">
     <input type="radio" name="trip-sorting" id="${this._id}" value="${this._name.toLowerCase()}" ${this._isChecked ? `checked` : ``}>
     <label class="trip-sorting__item trip-sorting__item--${this._name.toLowerCase()}" for="sorting-${this._name.toLowerCase()}">${this._name}</label></span>`.trim();
+  }
+  _onSortingClick() {
+    return typeof this._onSorting === `function` && this._onSorting();
   }
 
   bind() {

@@ -25,6 +25,7 @@ class PointEdit extends component {
     this._startObject = {
       price: data.price,
       offers: data.offers.map((a) => Object.assign({}, a)),
+      isFavorite: data.isFavorite
     };
     this._isFavorite = data.isFavorite;
 
@@ -42,43 +43,6 @@ class PointEdit extends component {
     this._onChangeDestination = this._onChangeDestination.bind(this);
   }
 
-  static setDestinations(data) {
-    this._destinations = data;
-  }
-
-  static setAllOffers(data) {
-    this._allOffersData = data;
-  }
-
-  _processForm(formData) {
-    const entry = {
-      city: ``,
-      type: ``,
-      time: this._time,
-      price: ``,
-    };
-
-    const pointEditMapper = PointEdit.createMapper(entry);
-
-    for (const pair of formData.entries()) {
-      const [property, value] = pair;
-      if (pointEditMapper[property]) {
-        pointEditMapper[property](value);
-      }
-    }
-
-    entry.type = this._type.toLowerCase();
-    entry.typeIcon = types[entry.type];
-    entry.description = this._description;
-    entry.offers = this._offers;
-    entry.picture = this._picture;
-    entry.isFavorite = this._isFavorite;
-    entry.date = this._date;
-    entry.dateDue = this._dateDue;
-
-    return entry;
-  }
-
   set onEsc(fn) {
     this._onEsc = fn;
   }
@@ -87,276 +51,8 @@ class PointEdit extends component {
     this._onDelete = fn;
   }
 
-  _onKeyDown(e) {
-    const ESC = 27;
-    if (e.keyCode === ESC) {
-      if (typeof this._onEsc === `function`) {
-        this._onEsc(this._startObject);
-        this._offers = this._startObject.offers.map((a) => Object.assign({}, a));
-      }
-    }
-  }
-
-  _onSubmitButtonClick(e) {
-    e.preventDefault();
-
-    const formData = new FormData(this._element.querySelector(`.point > form`));
-    const newData = this._processForm(formData);
-    if (typeof this._onSubmit === `function`) {
-      this._onSubmit(newData);
-    }
-
-    this.update(newData);
-  }
-
-  _onFormDelete(evt) {
-    evt.preventDefault();
-    if (typeof this._onDelete === `function`) {
-      this._onDelete({id: this._id});
-    }
-  }
-
-  _onCheckedChange(e) {
-    for (let offer of this._offers) {
-      if (e.target.id === offer.title.split(` `).join(`-`).toLocaleLowerCase()) {
-        offer.accepted = e.currentTarget.checked;
-      }
-    }
-  }
-
-  _onInputsChange(e) {
-    let currentName = e.target.name;
-    let currentValue = e.target.value;
-
-    switch (currentName) {
-      case `day`:
-        this._day = currentValue.split(` `)[0];
-        this._month = currentValue.split(` `)[1];
-        let year = currentValue.split(` `)[2];
-        this._date = new Date(`${this._day}, ${this._month}, ${year}`);
-        break;
-      case `price`:
-        this._price = currentValue;
-        break;
-    }
-  }
-  _onFavoriteChange() {
-    this.isFavorite = !this.isFavorite;
-  }
-
-  _onEventChange(e) {
-    let typeName = e.target.value;
-
-    this._type = typeName;
-    this._typeIcon = types[typeName];
-    for (const offer of this._offers) {
-      if (offer.accepted) {
-        this._price -= offer.price;
-      }
-    }
-
-    PointEdit._allOffersData.forEach((offersByType) => {
-      if (offersByType.type === typeName) {
-        this._offers = this._convertOffers(offersByType.offers);
-        this._startObject.offers = this._offers.map((a) => Object.assign({}, a));
-      }
-    });
-
-    this._partialUpdate();
-    this.bind();
-  }
-
-  _convertOffers(offers) {
-    return offers.map((offer) => {
-      return {
-        title: offer.name,
-        price: offer.price,
-      };
-    });
-  }
-
-  _onOfferChange(e) {
-    this._price = Number(this._price);
-    if (e.target.checked === true) {
-      this._price += Number(e.target.value);
-    } else {
-      this._price -= Number(e.target.value);
-    }
-
-    this._onCheckedChange(e);
-    this._partialUpdate();
-    this.bind();
-  }
-
-  _onChangeDestination() {
-    const destInput = this._element.querySelector(`.point__destination-input`);
-    let newDestination;
-    if (PointEdit._destinations.some((destination) => destInput.value === destination.name)) {
-      PointEdit._destinations.forEach((destination) => {
-        if (destination.name === destInput.value) {
-          newDestination = destination;
-        }
-      });
-      this._city = newDestination.name;
-      this._description = newDestination.description;
-      this._picture = newDestination.pictures;
-      this._partialUpdate();
-    }
-
-    this.bind();
-  }
-
   set onSubmit(fn) {
     this._onSubmit = fn;
-  }
-
-  _partialUpdate() {
-    const currentElement = createElement(this.template);
-    let filledContainer = document.createElement(`div`).innerHTML;
-    filledContainer = currentElement;
-    this._element.innerHTML = filledContainer.firstElementChild.outerHTML;
-  }
-
-  _createCycleListeners() {
-    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
-    for (let i = 0; i < offersInput.length; i++) {
-      offersInput[i].addEventListener(`change`, this._onOfferChange);
-    }
-
-    const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
-    for (let i = 0; i < travelSelect.length; i++) {
-      travelSelect[i].addEventListener(`click`, this._onEventChange);
-    }
-
-    const inputs = this.element.querySelectorAll(`.point__header input[type="text"]`);
-    for (let i = 0; i < inputs.length; i++) {
-      inputs[i].addEventListener(`change`, this._onInputsChange);
-    }
-  }
-
-  _removeCycleListeners() {
-    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
-    for (let i = 0; i < offersInput.length; i++) {
-      offersInput[i].removeEventListener(`change`, this._onOfferChange);
-    }
-
-    const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
-    for (let i = 0; i < travelSelect.length; i++) {
-      travelSelect[i].removeEventListener(`click`, this._onEventChange);
-    }
-
-    const inputs = this.element.querySelector(`input[type="text"]`);
-    for (let i = 0; i < inputs.length; i++) {
-      inputs[i].removeEventListener(`change`, this._onInputsChange);
-    }
-  }
-
-  bind() {
-    const dateStart = this.element.querySelector(`.point__time input[name="date-start"]`);
-    const dateEnd = this.element.querySelector(`.point__time input[name="date-end"]`);
-    const form = this.element.querySelector(`form`);
-
-    form.addEventListener(`submit`, this._onSubmitButtonClick);
-
-    document.addEventListener(`keydown`, this._onKeyDown);
-
-    this._element.querySelector(`#favorite`)
-      .addEventListener(`change`, this._onFavoriteChange);
-
-    form.addEventListener(`reset`, this._onFormDelete);
-
-    this._element.querySelector(`.point__destination-input`)
-      .addEventListener(`change`, this._onChangeDestination);
-
-    flatpickr(dateStart, {
-      'defaultDate': [this._date],
-      'enableTime': true,
-      'time_24hr': true,
-      'dateFormat': `H:i`,
-      'onChange': (selectedDates) => {
-        this._date = selectedDates[0];
-        if (this._date && this._dateDue) {
-          this._time = getTime(this._date, this._dateDue);
-        }
-      },
-    });
-
-    flatpickr(dateEnd, {
-      'defaultDate': [this._dateDue],
-      'enableTime': true,
-      'time_24hr': true,
-      'dateFormat': `H:i`,
-      'onChange': (selectedDates) => {
-        this._dateDue = selectedDates[0];
-        if (this._date && this._dateDue) {
-          this._time = getTime(this._date, this._dateDue);
-        }
-      },
-    });
-
-    this._createCycleListeners();
-  }
-
-  unbind() {
-    this._element.removeEventListener(`submit`, this._onSubmitButtonClick);
-
-    document.removeEventListener(`keydown`, this._onKeyDown);
-
-    this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormDelete);
-
-    this._element.querySelector(`#favorite`)
-      .removeEventListener(`change`, this._onFavoriteChange);
-
-    this._element.querySelector(`.point__destination-input`)
-      .removeEventListener(`change`, this._onChangeDestination);
-
-    this._removeCycleListeners();
-  }
-
-  update(data) {
-    this._city = data.city;
-    this._type = data.type;
-    this._typeIcon = data.typeIcon;
-    this._description = data.description;
-    this._price = data.price;
-    this._picture = data.picture;
-    this._offers = data.offers;
-    this._time = data.time;
-    this._date = data.date;
-    this._dateDue = data.dateDue;
-    this._isFavorite = data.isFavorite;
-  }
-
-  shake() {
-    const ANIMATION_TIMEOUT = 600;
-    this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      this._element.style.animation = ``;
-    }, ANIMATION_TIMEOUT);
-  }
-
-  static createMapper(target) {
-    return {
-      'price': (value) => {
-        target.price = value;
-      },
-      'destination': (value) => {
-        target.city = value;
-      },
-      'favorite': () => {
-        target.isFavorite = true;
-      },
-      'time': (value) => {
-        target.time = value;
-      },
-      'icon': (value) => {
-        target.icon = value;
-      },
-      'day': (value) => {
-        target.day = value;
-      }
-    };
   }
   get template() {
     return `
@@ -468,7 +164,303 @@ class PointEdit extends component {
               </form>
             </article>`;
   }
+
+  _processForm(formData) {
+    const entry = {
+      city: ``,
+      type: ``,
+      time: this._time,
+      price: ``,
+    };
+
+    const pointEditMapper = PointEdit.createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      if (pointEditMapper[property]) {
+        pointEditMapper[property](value);
+      }
+    }
+
+    entry.type = this._type.toLowerCase();
+    entry.typeIcon = types[entry.type];
+    entry.description = this._description;
+    entry.offers = this._offers;
+    entry.picture = this._picture;
+    entry.date = this._date;
+    entry.dateDue = this._dateDue;
+
+    return entry;
+  }
+  update(data) {
+    this._city = data.city;
+    this._type = data.type;
+    this._typeIcon = data.typeIcon;
+    this._description = data.description;
+    this._price = data.price;
+    this._picture = data.picture;
+    this._offers = data.offers;
+    this._time = data.time;
+    this._date = data.date;
+    this._dateDue = data.dateDue;
+    this._isFavorite = data.isFavorite;
+  }
+
+  shake() {
+    const ANIMATION_TIMEOUT = 600;
+    this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._element.style.animation = ``;
+    }, ANIMATION_TIMEOUT);
+  }
+  _onKeyDown(e) {
+    const ESC = 27;
+    if (e.keyCode === ESC) {
+      if (typeof this._onEsc === `function`) {
+        this._onEsc(this._startObject);
+        this._offers = this._startObject.offers.map((a) => Object.assign({}, a));
+      }
+    }
+  }
+
+  _onSubmitButtonClick(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this._element.querySelector(`.point > form`));
+    const newData = this._processForm(formData);
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit(newData);
+    }
+
+    this.update(newData);
+  }
+
+  _onFormDelete(evt) {
+    evt.preventDefault();
+    if (typeof this._onDelete === `function`) {
+      this._onDelete({id: this._id});
+    }
+  }
+
+  _onCheckedChange(e) {
+    for (let offer of this._offers) {
+      if (e.target.id === offer.title.split(` `).join(`-`).toLocaleLowerCase()) {
+        offer.accepted = e.currentTarget.checked;
+      }
+    }
+  }
+
+  _onInputsChange(e) {
+    let currentName = e.target.name;
+    let currentValue = e.target.value;
+
+    switch (currentName) {
+      case `day`:
+        this._day = currentValue.split(` `)[0];
+        this._month = currentValue.split(` `)[1];
+        let year = currentValue.split(` `)[2];
+        this._date = new Date(`${this._day}, ${this._month}, ${year}`);
+        break;
+      case `price`:
+        this._price = currentValue;
+        break;
+    }
+  }
+  _onFavoriteChange() {
+    this._isFavorite = !this._isFavorite;
+  }
+
+  _onEventChange(e) {
+    let typeName = e.target.value;
+
+    this._type = typeName;
+    this._typeIcon = types[typeName];
+    for (const offer of this._offers) {
+      if (offer.accepted) {
+        this._price -= offer.price;
+      }
+    }
+
+    PointEdit._allOffersData.forEach((offersByType) => {
+      if (offersByType.type === typeName) {
+        this._offers = this._convertOffers(offersByType.offers);
+        this._startObject.offers = this._offers.map((a) => Object.assign({}, a));
+        this._startObject.isFavorite = this._isFavorite;
+      }
+    });
+
+    this._partialUpdate();
+    this.bind();
+  }
+
+  _convertOffers(offers) {
+    return offers.map((offer) => {
+      return {
+        title: offer.name,
+        price: offer.price,
+      };
+    });
+  }
+
+  _onOfferChange(e) {
+    this._price = Number(this._price);
+    if (e.target.checked === true) {
+      this._price += Number(e.target.value);
+    } else {
+      this._price -= Number(e.target.value);
+    }
+
+    this._onCheckedChange(e);
+    this._partialUpdate();
+    this.bind();
+  }
+
+  _onChangeDestination() {
+    const destInput = this._element.querySelector(`.point__destination-input`);
+    let newDestination;
+    if (PointEdit._destinations.some((destination) => destInput.value === destination.name)) {
+      PointEdit._destinations.forEach((destination) => {
+        if (destination.name === destInput.value) {
+          newDestination = destination;
+        }
+      });
+      this._city = newDestination.name;
+      this._description = newDestination.description;
+      this._picture = newDestination.pictures;
+      this._partialUpdate();
+    }
+
+    this.bind();
+  }
+
+  _partialUpdate() {
+    const currentElement = createElement(this.template);
+    let filledContainer = document.createElement(`div`).innerHTML;
+    filledContainer = currentElement;
+    this._element.innerHTML = filledContainer.firstElementChild.outerHTML;
+  }
+
+  _createCycleListeners() {
+    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
+    for (let i = 0; i < offersInput.length; i++) {
+      offersInput[i].addEventListener(`change`, this._onOfferChange);
+    }
+
+    const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
+    for (let i = 0; i < travelSelect.length; i++) {
+      travelSelect[i].addEventListener(`click`, this._onEventChange);
+    }
+
+    const inputs = this.element.querySelectorAll(`.point__header input[type="text"]`);
+    for (let i = 0; i < inputs.length; i++) {
+      inputs[i].addEventListener(`change`, this._onInputsChange);
+    }
+  }
+
+  _removeCycleListeners() {
+    const offersInput = this._element.querySelectorAll(`.point__offers-input`);
+    for (let i = 0; i < offersInput.length; i++) {
+      offersInput[i].removeEventListener(`change`, this._onOfferChange);
+    }
+
+    const travelSelect = this._element.querySelectorAll(`.travel-way__select-input`);
+    for (let i = 0; i < travelSelect.length; i++) {
+      travelSelect[i].removeEventListener(`click`, this._onEventChange);
+    }
+
+    const inputs = this.element.querySelector(`input[type="text"]`);
+    for (let i = 0; i < inputs.length; i++) {
+      inputs[i].removeEventListener(`change`, this._onInputsChange);
+    }
+  }
+
+  bind() {
+    const dateStart = this.element.querySelector(`.point__time input[name="date-start"]`);
+    const dateEnd = this.element.querySelector(`.point__time input[name="date-end"]`);
+    const form = this.element.querySelector(`form`);
+
+    form.addEventListener(`submit`, this._onSubmitButtonClick);
+
+    document.addEventListener(`keydown`, this._onKeyDown);
+
+    this._element.querySelector(`#favorite`)
+      .addEventListener(`change`, this._onFavoriteChange);
+
+    form.addEventListener(`reset`, this._onFormDelete);
+
+    this._element.querySelector(`.point__destination-input`)
+      .addEventListener(`change`, this._onChangeDestination);
+
+    flatpickr(dateStart, {
+      'defaultDate': [this._date],
+      'enableTime': true,
+      'time_24hr': true,
+      'dateFormat': `H:i`,
+      'onChange': (selectedDates) => {
+        this._date = selectedDates[0];
+        if (this._date && this._dateDue) {
+          this._time = getTime(this._date, this._dateDue);
+        }
+      },
+    });
+
+    flatpickr(dateEnd, {
+      'defaultDate': [this._dateDue],
+      'enableTime': true,
+      'time_24hr': true,
+      'dateFormat': `H:i`,
+      'onChange': (selectedDates) => {
+        this._dateDue = selectedDates[0];
+        if (this._date && this._dateDue) {
+          this._time = getTime(this._date, this._dateDue);
+        }
+      },
+    });
+
+    this._createCycleListeners();
+  }
+
+  unbind() {
+    this._element.removeEventListener(`submit`, this._onSubmitButtonClick);
+
+    document.removeEventListener(`keydown`, this._onKeyDown);
+
+    this._element.querySelector(`form`).removeEventListener(`reset`, this._onFormDelete);
+
+    this._element.querySelector(`#favorite`)
+      .removeEventListener(`change`, this._onFavoriteChange);
+
+    this._element.querySelector(`.point__destination-input`)
+      .removeEventListener(`change`, this._onChangeDestination);
+
+    this._removeCycleListeners();
+  }
+  static createMapper(target) {
+    return {
+      'price': (value) => {
+        target.price = value;
+      },
+      'destination': (value) => {
+        target.city = value;
+      },
+      'time': (value) => {
+        target.time = value;
+      },
+      'icon': (value) => {
+        target.icon = value;
+      },
+      'day': (value) => {
+        target.day = value;
+      }
+    };
+  }
+  static setDestinations(data) {
+    this._destinations = data;
+  }
+
+  static setAllOffers(data) {
+    this._allOffersData = data;
+  }
 }
-
-
 export default PointEdit;
