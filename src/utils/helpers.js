@@ -59,4 +59,13 @@ const types = {
   'sightseeing': `🏛`,
   // 'Restaurant': `🍴`,
 };
-export {getRandomElement, getRandomNum, shuffleArray, getTime, getDuration, types};
+
+const setTotaCost = (points, container) => {
+  container.innerHTML = ``;
+  const newTotaCostComponent = new TotaCost();
+
+  container.getPrice(points);
+  container.appendChild(newTotaCostComponent.render());
+
+};
+export {getRandomElement, getRandomNum, shuffleArray, getTime, getDuration, types, setTotaCost};

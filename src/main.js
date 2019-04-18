@@ -13,7 +13,7 @@ const mainFilter = document.querySelector(`.trip-filter`);
 const mainSorting = document.querySelector(`.trip-sorting`);
 const offersBlock = document.querySelector(`.trip-sorting__item--offers`);
 const newTask = document.querySelector(`.new-event`);
-const TotaCostContainer = document.querySelector(`.trip__total`);
+const totaCostContainer = document.querySelector(`.trip__total`);
 
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
@@ -126,7 +126,7 @@ function renderFilters(filtersData) {
           tripPoints.innerHTML = ``;
           sortPointsByDay(filteredPoints);
           renderPoints(pointsByDay);
-          setTotaCost(pointsByDay);
+          setTotaCost(pointsByDay, totaCostContainer);
         });
     };
   });
@@ -135,7 +135,7 @@ function renderFilters(filtersData) {
 
 const renderPoints = (data) => {
   tripPoints.innerHTML = ``;
-  setTotaCost(data);
+  setTotaCost(data, totaCostContainer);
   data.forEach((dayPoints) => {
     let day = new TripDay(dayPoints);
     tripPoints.appendChild(day.render());
@@ -189,7 +189,7 @@ newTask.addEventListener(`click`, () => {
       .then((points) => {
         sortPointsByDay(points);
         renderPoints(pointsByDay);
-        setTotaCost(pointsByDay);
+        setTotaCost(pointsByDay, totaCostContainer);
       });
   };
   pointEdit.onDelete = () => {
@@ -217,12 +217,12 @@ for (const btn of statBtns) {
 }
 
 
-const setTotaCost = (points) => {
-  TotaCostContainer.innerHTML = ``;
+const setTotaCost = (points, container) => {
+  container.innerHTML = ``;
   const newTotaCostComponent = new TotaCost();
 
   newTotaCostComponent.getPrice(points);
-  TotaCostContainer.appendChild(newTotaCostComponent.render());
+  container.appendChild(newTotaCostComponent.render());
 
 };
 renderFilters(filtersRawData);
