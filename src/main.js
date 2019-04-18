@@ -6,14 +6,14 @@ import moment from "moment";
 import TripDay from "./components/trip-day";
 import ModelPoint from "./points-adapter";
 import {updateCharts} from "./statistic";
-import TotalPrice from './components/total-price';
+import TotaCost from './components/total-price';
 
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
 const mainSorting = document.querySelector(`.trip-sorting`);
 const offersBlock = document.querySelector(`.trip-sorting__item--offers`);
 const newTask = document.querySelector(`.new-event`);
-const totalPriceContainer = document.querySelector(`.trip__total`);
+const TotaCostContainer = document.querySelector(`.trip__total`);
 
 const HIDDEN_CLASS = `visually-hidden`;
 const ACTIVE_STAT = `view-switch__item--active`;
@@ -126,6 +126,7 @@ function renderFilters(filtersData) {
           tripPoints.innerHTML = ``;
           sortPointsByDay(filteredPoints);
           renderPoints(pointsByDay);
+          setTotaCost(pointsByDay);
         });
     };
   });
@@ -134,7 +135,7 @@ function renderFilters(filtersData) {
 
 const renderPoints = (data) => {
   tripPoints.innerHTML = ``;
-  setTotalPrice(data);
+  setTotaCost(data);
   data.forEach((dayPoints) => {
     let day = new TripDay(dayPoints);
     tripPoints.appendChild(day.render());
@@ -187,8 +188,8 @@ newTask.addEventListener(`click`, () => {
     api.getPoints()
       .then((points) => {
         sortPointsByDay(points);
-        setTotalPrice(points);
         renderPoints(pointsByDay);
+        setTotaCost(pointsByDay);
       });
   };
   pointEdit.onDelete = () => {
@@ -216,11 +217,13 @@ for (const btn of statBtns) {
 }
 
 
-const setTotalPrice = (points) => {
-  totalPriceContainer.innerHTML = ``;
-  const newTotalPriceComponent = new TotalPrice();
-  newTotalPriceComponent.getPrice(points);
-  totalPriceContainer.appendChild(newTotalPriceComponent.render());
+const setTotaCost = (points) => {
+  TotaCostContainer.innerHTML = ``;
+  const newTotaCostComponent = new TotaCost();
+
+  newTotaCostComponent.getPrice(points);
+  TotaCostContainer.appendChild(newTotaCostComponent.render());
+
 };
 renderFilters(filtersRawData);
 
