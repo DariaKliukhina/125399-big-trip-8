@@ -6,7 +6,7 @@ import moment from "moment";
 import TripDay from "./components/trip-day";
 import ModelPoint from "./points-adapter";
 import {updateCharts} from "./statistic";
-import {setTotalCost} from './utils/helpers';
+import {setTotalCost, sortPointsByDay} from './utils/helpers';
 
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
@@ -53,18 +53,6 @@ function renderSorting(sortingData) {
 renderSorting(sortingRawData);
 
 let pointsByDay = new Map();
-const sortPointsByDay = (data) => {
-  pointsByDay.clear();
-  for (let point of data) {
-    if (!pointsByDay.has(point.uniqueDay)) {
-      pointsByDay.set(point.uniqueDay, [point]);
-    } else {
-      pointsByDay.get(point.uniqueDay).push(point);
-    }
-  }
-
-  pointsByDay = new Map([...pointsByDay.entries()].sort());
-};
 
 const sortingPoints = (data, sortingName) => {
   let sortingParameter;
@@ -124,9 +112,8 @@ function renderFilters(filtersData) {
         .then((allPoints) => {
           const filteredPoints = filterPoints(allPoints, filterName);
           tripPoints.innerHTML = ``;
-          sortPointsByDay(filteredPoints);
+          sortPointsByDay(filteredPoints, pointsByDay);
           renderPoints(pointsByDay);
-          console.log(pointsByDay);
           setTotalCost(pointsByDay, totaCostContainer);
         });
     };
@@ -143,7 +130,7 @@ const renderPoints = (data) => {
     day.onDelete = () => {
       api.getPoints()
         .then((remainPoints) => {
-          sortPointsByDay(remainPoints);
+          sortPointsByDay(remainPoints, pointsByDay);
           renderPoints(pointsByDay);
         });
     };
@@ -188,7 +175,7 @@ newTask.addEventListener(`click`, () => {
 
     api.getPoints()
       .then((points) => {
-        sortPointsByDay(points);
+        sortPointsByDay(points, pointsByDay);
         renderPoints(pointsByDay);
         setTotalCost(pointsByDay, totaCostContainer);
       });
@@ -229,7 +216,7 @@ Promise.all([api.getPoints(), api.getDestinations(), api.getOffers()])
     tripPoints.removeChild(msg);
     PointEdit.setDestinations(destinations);
     PointEdit.setAllOffers(offers);
-    sortPointsByDay(pointsData);
+    sortPointsByDay(pointsData, pointsByDay);
     renderPoints(pointsByDay);
   })
   .catch(() => {

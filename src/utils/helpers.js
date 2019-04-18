@@ -70,4 +70,18 @@ const setTotalCost = (points, container) => {
   container.appendChild(newTotaCostComponent.render());
 
 };
-export {getRandomElement, getRandomNum, shuffleArray, getTime, getDuration, types, setTotalCost};
+
+const sortPointsByDay = (data, points) => {
+  points.clear();
+  for (let point of data) {
+    if (!points.has(point.uniqueDay)) {
+      points.set(point.uniqueDay, [point]);
+    } else {
+      points.get(point.uniqueDay).push(point);
+    }
+  }
+
+  points = new Map([...points.entries()].sort());
+};
+
+export {getRandomElement, getRandomNum, shuffleArray, getTime, getDuration, types, setTotalCost, sortPointsByDay};
