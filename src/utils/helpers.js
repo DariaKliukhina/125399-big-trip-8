@@ -19,31 +19,50 @@ function shuffleArray(array) {
 
 const getTime = (date, dateDue) => {
   const diffMs = dateDue - date;
-  const diffHrs = Math.floor(diffMs / 3600000);
   const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
+
+  const msHrs = diffMs / 3600000;
+  let diffDays = Math.floor(msHrs / 24);
+
+  const msDays = diffDays * 86400000;
+
+  const msDiffHours = (diffMs - msDays);
+  const tmpDiffHrs = Math.floor(msDiffHours / 3600000);
+  let diffHrs = `${tmpDiffHrs}H`;
 
   let hours = date.getHours();
   let minutes = date.getMinutes();
   if (hours < 10) {
-    hours = `0` + hours;
+    hours = `0${hours}`;
   }
   if (minutes < 10) {
-    minutes = `0` + minutes;
+    minutes = `0${minutes}`;
   }
 
   let dueHours = dateDue.getHours();
   let dueMinutes = dateDue.getMinutes();
   if (dueHours < 10) {
-    dueHours = `0` + dueHours;
+    dueHours = `0${dueHours}`;
   }
   if (dueMinutes < 10) {
-    dueMinutes = `0` + dueMinutes;
+    dueMinutes = `0${dueMinutes}`;
+  }
+  if (diffDays === 0) {
+    diffDays = ``;
+
+    if (tmpDiffHrs === 0) {
+      diffHrs = ``;
+    } else {
+      diffHrs = `${diffHrs}`;
+    }
+  } else {
+    diffDays = `${diffDays}D `;
   }
 
   return {
-    from: hours + `:` + minutes,
-    due: dueHours + `:` + dueMinutes,
-    duration: diffHrs + `H ` + diffMins
+    from: `${hours}:${minutes}`,
+    due: `${dueHours}:${dueMinutes}`,
+    duration: `${diffDays} ${diffHrs} ${diffMins}M`
   };
 };
 const getDuration = (date, dateDue) => {
