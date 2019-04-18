@@ -6,7 +6,7 @@ import moment from "moment";
 import TripDay from "./components/trip-day";
 import ModelPoint from "./points-adapter";
 import {updateCharts} from "./statistic";
-import TotaCost from './components/total-price';
+import {setTotalCost} from './utils/helpers';
 
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
@@ -126,7 +126,8 @@ function renderFilters(filtersData) {
           tripPoints.innerHTML = ``;
           sortPointsByDay(filteredPoints);
           renderPoints(pointsByDay);
-          setTotaCost(pointsByDay, totaCostContainer);
+          console.log(pointsByDay);
+          setTotalCost(pointsByDay, totaCostContainer);
         });
     };
   });
@@ -135,7 +136,7 @@ function renderFilters(filtersData) {
 
 const renderPoints = (data) => {
   tripPoints.innerHTML = ``;
-  setTotaCost(data, totaCostContainer);
+  setTotalCost(data, totaCostContainer);
   data.forEach((dayPoints) => {
     let day = new TripDay(dayPoints);
     tripPoints.appendChild(day.render());
@@ -189,7 +190,7 @@ newTask.addEventListener(`click`, () => {
       .then((points) => {
         sortPointsByDay(points);
         renderPoints(pointsByDay);
-        setTotaCost(pointsByDay, totaCostContainer);
+        setTotalCost(pointsByDay, totaCostContainer);
       });
   };
   pointEdit.onDelete = () => {
@@ -216,15 +217,6 @@ for (const btn of statBtns) {
   });
 }
 
-
-const setTotaCost = (points, container) => {
-  container.innerHTML = ``;
-  const newTotaCostComponent = new TotaCost();
-
-  newTotaCostComponent.getPrice(points);
-  container.appendChild(newTotaCostComponent.render());
-
-};
 renderFilters(filtersRawData);
 
 let msg = document.createElement(`div`);

@@ -1,3 +1,5 @@
+import TotaCost from '../components/total-price';
+
 const getRandomNum = (count) => {
   return Math.floor(Math.random() * count);
 };
@@ -60,12 +62,12 @@ const types = {
   // 'Restaurant': `🍴`,
 };
 
-const setTotaCost = (points, container) => {
+const setTotalCost = (points, container) => {
   container.innerHTML = ``;
   const newTotaCostComponent = new TotaCost();
 
-  container.getPrice(points);
+  newTotaCostComponent.getPrice(points);
   container.appendChild(newTotaCostComponent.render());
 
 };
-export {getRandomElement, getRandomNum, shuffleArray, getTime, getDuration, types, setTotaCost};
+export {getRandomElement, getRandomNum, shuffleArray, getTime, getDuration, types, setTotalCost};

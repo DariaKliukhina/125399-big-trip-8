@@ -1,7 +1,7 @@
 import Point from "../points/point";
 import PointEdit from "../points/point-edit";
 import {api} from '../api';
-import {setTotaCost} from '../utils/helpers';
+import {setTotalCost} from '../utils/helpers';
 
 class TripDay {
   constructor(data) {
@@ -81,14 +81,20 @@ class TripDay {
             point.update(newPoint);
             point.render();
             this._dayElements.replaceChild(point.element, pointEdit.element);
-            // setTotaCost (pointsByDay, TotaCostContainer);
             pointEdit.unrender();
+            api.getPoints()
+            .then((remainPoints) => {
+              console.log(remainPoints);
+              setTotalCost (remainPoints, TotaCostContainer);
+            })
           })
           .catch(() => {
             pointEdit.shake();
             pointEdit.element.classList.add(`point--error`);
             unblock();
           });
+
+
       };
 
       pointEdit.onEsc = (initialObject) => {

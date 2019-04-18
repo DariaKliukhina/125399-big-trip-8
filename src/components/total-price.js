@@ -10,10 +10,16 @@ class TotalCost extends PointComponent {
   getPrice(data) {
     let tripPointPrice = 0;
 
-    for (let [key, value] of data) {
-      value.map(point => {
+    if (typeof data === `array` ) {
+      data.map(point => {
         tripPointPrice += Number(point.price);
       })
+    } else {
+      for (let [key, value] of data) {
+        value.map(point => {
+          tripPointPrice += Number(point.price);
+        })
+      }
     }
 
     this._totaCost = tripPointPrice;
