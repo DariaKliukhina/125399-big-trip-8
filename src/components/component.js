@@ -10,10 +10,18 @@ class PointComponent {
     this._state = {};
   }
 
+  get date() {
+    return {
+      day: this._day,
+      month: this._month,
+      uniqueDay: this._uniqueDay,
+      time: this._time,
+    };
+  }
+
   get element() {
     return this._element;
   }
-
   get template() {
     throw new Error(`You have to define template.`);
   }
@@ -23,10 +31,6 @@ class PointComponent {
     this.bind();
     return this._element;
   }
-
-  bind() {}
-
-  unbind() {}
 
   unrender() {
     this.unbind();
@@ -40,6 +44,10 @@ class PointComponent {
   }
 
   update() {}
+
+  bind() {}
+
+  unbind() {}
 }
 
 export default PointComponent;

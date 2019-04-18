@@ -21,7 +21,7 @@ class Filter extends component {
 
   get template() {
     return `<span class="filter-wrap">
-  <input type="radio" class="trip-filter__input" id="filter-${this._name.toLowerCase()}" name="filter" value="${this._name.toLowerCase()}" ${this._isChecked ? `checked` : ``}>
+  <input type="radio" class="trip-filter__input" id="${this._id}" name="filter" value="${this._name.toLowerCase()}" ${this._isChecked ? `checked` : ``}>
     <label class="trip-filter__item" for="filter-${this._name.toLowerCase()}">${this._name}</label></span>`.trim();
   }
 

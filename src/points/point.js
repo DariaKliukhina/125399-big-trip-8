@@ -24,16 +24,6 @@ class Point extends component {
     this._onEditClick = this._onEditClick.bind(this);
   }
 
-  _onEditClick() {
-    if (typeof this._onClick === `function`) {
-      this._onClick();
-    }
-  }
-
-  _partialUpdate() {
-    this._element.innerHTML = this.template;
-  }
-
   set onClick(fn) {
     this._onClick = fn;
   }
@@ -52,22 +42,14 @@ class Point extends component {
       ${ this._offers.map((offer) => {
     if (offer.accepted) {
       return `<li>
-                <button class="trip-point__offer">${offer.title || ``}</button>
-              </li>`;
+                  <button class="trip-point__offer">${offer.title || ``}</button>
+                </li>`;
     } else {
       return ``;
     }
   }).join(``).trim()}
       </ul>
     </article>`.trim();
-  }
-
-  bind() {
-    this._element.addEventListener(`click`, this._onEditClick);
-  }
-
-  unbind() {
-    this._element.removeEventListener(`click`, this._onEditClick);
   }
 
   update(data) {
@@ -80,6 +62,26 @@ class Point extends component {
     this._date = data.date;
     this._dateDue = data.dateDue;
   }
+
+  _onEditClick() {
+    if (typeof this._onClick === `function`) {
+      this._onClick();
+    }
+  }
+
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
+  }
+
+  bind() {
+    this._element.addEventListener(`click`, this._onEditClick);
+  }
+
+  unbind() {
+    this._element.removeEventListener(`click`, this._onEditClick);
+  }
+
+
 }
 
 export default Point;

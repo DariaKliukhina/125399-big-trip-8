@@ -1,3 +1,5 @@
+import {getTime, getDuration} from './utils/helpers';
+
 class ModelPoint {
   constructor(data) {
     this.id = data[`id`];
@@ -13,8 +15,9 @@ class ModelPoint {
     this.uniqueDay = this._formatNewDate(data[`date_from`]).uniqueDay;
     this.date = new Date(data[`date_from`]);
     this.dateDue = new Date(data[`date_to`]);
-    this.time = this._getTime(this.date, this.dateDue);
+    this.time = getTime(this.date, this.dateDue);
     this.isFavorite = Boolean(data[`is_favorite`]);
+    this.duration = getDuration(this.date, this.dateDue);
   }
 
   toRAW() {
@@ -40,7 +43,7 @@ class ModelPoint {
       `Jul`, `Aug`, `Sep`, `Oct`, `Nov`, `Dec`];
 
     return {
-      tripYear: (`` + date.getFullYear()).substr(-2),
+      tripYear: `` + date.getFullYear(),
       tripMonth: monthNames[date.getMonth()],
       tripDay: date.getDate().toString(),
       uniqueDay: `` + date.getDate() + (date.getMonth() + 1) + date.getFullYear(),
@@ -91,36 +94,6 @@ class ModelPoint {
       };
       default: return `no valid type`;
     }
-  }
-
-  _getTime(date, dateDue) {
-    const diffMs = dateDue - date;
-    const diffHrs = Math.floor(diffMs / 3600000);
-    const diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000);
-
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    if (hours < 10) {
-      hours = `0` + hours;
-    }
-    if (minutes < 10) {
-      minutes = `0` + minutes;
-    }
-
-    let dueHours = dateDue.getHours();
-    let dueMinutes = dateDue.getMinutes();
-    if (dueHours < 10) {
-      dueHours = `0` + dueHours;
-    }
-    if (dueMinutes < 10) {
-      dueMinutes += `0`;
-    }
-
-    return {
-      from: hours + `:` + minutes,
-      due: dueHours + `:` + dueMinutes,
-      duration: diffHrs + `H ` + diffMins
-    };
   }
 
   static parsePoint(data) {

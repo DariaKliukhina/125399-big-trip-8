@@ -1,6 +1,7 @@
 import Point from "../points/point";
 import PointEdit from "../points/point-edit";
 import {api} from '../api';
+import {setTotalCost, sortPointsByDay} from '../utils/helpers';
 
 class TripDay {
   constructor(data) {
@@ -13,12 +14,29 @@ class TripDay {
     this._recentlyDeletedId = null;
     this._element = null;
     this._onDelete = null;
+    this._onSubmit = null;
+
   }
 
-  _createElement(template) {
-    const newElement = document.createElement(`div`);
-    newElement.innerHTML = template;
-    return newElement.firstChild;
+  set onDelete(fn) {
+    this._onDelete = fn;
+  }
+
+  get element() {
+    return this._element;
+  }
+
+  get template() {
+    return `
+    <section class="trip-day">
+      <article class="trip-day__info">
+        <span class="trip-day__caption">Day</span>
+        <p class="trip-day__number">${this._day}</p>
+        <h2 class="trip-day__title">${this._month}</h2>
+      </article>
+      <div class="trip-day__items">
+      </div>
+    </section>`.trim();
   }
 
   render() {
@@ -31,7 +49,11 @@ class TripDay {
     });
     return this._element;
   }
-
+  _createElement(template) {
+    const newElement = document.createElement(`div`);
+    newElement.innerHTML = template;
+    return newElement.firstChild;
+  }
   build() {
     this._pointsData.forEach((pointData, i) => {
       let point = new Point(pointData);
@@ -56,6 +78,7 @@ class TripDay {
         pointData.offers = newObject.offers;
         pointData.date = newObject.date;
         pointData.dateDue = newObject.dateDue;
+        pointData.isFavorite = newObject.dateDue;
 
         const block = () => {
           pointEdit.element.querySelector(`.point__button--save`).innerText = `Saving...`;
@@ -67,8 +90,10 @@ class TripDay {
           pointEdit.element.querySelector(`.point__button--save`).disabled = false;
         };
 
-        block();
+        const totalCostContainer = document.querySelector(`.trip__total`);
 
+        block();
+        let pointsByDay = new Map();
         api.updatePoint({id: pointData.id, data: pointData.toRAW()})
           .then((newPoint) => {
             unblock();
@@ -76,6 +101,11 @@ class TripDay {
             point.render();
             this._dayElements.replaceChild(point.element, pointEdit.element);
             pointEdit.unrender();
+            api.getPoints()
+            .then((remainPoints) => {
+              sortPointsByDay(remainPoints, pointsByDay);
+              setTotalCost(pointsByDay, totalCostContainer);
+            });
           })
           .catch(() => {
             pointEdit.shake();
@@ -85,11 +115,12 @@ class TripDay {
       };
 
       pointEdit.onEsc = (initialObject) => {
-        const tripDay = document.querySelector(`.trip-day__items`);
-        point.price = initialObject.price;
+        point._price = initialObject.price;
+        point._offers = initialObject.offers;
+        point._isFavorite = initialObject.isFavorite;
         pointEdit.update(pointData);
         point.render();
-        tripDay.replaceChild(point.element, pointEdit.element);
+        this._dayElements.replaceChild(point.element, pointEdit.element);
         pointEdit.unrender();
       };
 
@@ -124,30 +155,8 @@ class TripDay {
       };
     });
   }
-
   unrender() {
     this._element = null;
-  }
-
-  set onDelete(fn) {
-    this._onDelete = fn;
-  }
-
-  get element() {
-    return this._element;
-  }
-
-  get template() {
-    return `
-    <section class="trip-day">
-      <article class="trip-day__info">
-        <span class="trip-day__caption">Day</span>
-        <p class="trip-day__number">${this._day}</p>
-        <h2 class="trip-day__title">${this._month}</h2>
-      </article>
-      <div class="trip-day__items">
-      </div>
-    </section>`.trim();
   }
 }
 
