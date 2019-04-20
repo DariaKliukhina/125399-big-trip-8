@@ -7,7 +7,6 @@ class Filter extends component {
     this._name = data.name;
     this._isChecked = data.checked;
     this._isDisabled = data.disabled;
-
     this._onFilter = null;
     this._onFilterClick = this._onFilterClick.bind(this);
   }

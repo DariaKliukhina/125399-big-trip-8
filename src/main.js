@@ -158,7 +158,6 @@ newTask.addEventListener(`click`, (e) => {
 
   const point = new ModelPoint(newPoint);
   const pointEdit = new PointEdit(point);
-
   pointEdit.onSubmit = (newObject) => {
     newPoint.destination = {
       name: newObject.city,
