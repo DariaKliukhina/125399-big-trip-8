@@ -55,16 +55,20 @@ let pointsByDay = new Map();
 let currentFilter;
 const sortingPoints = (data, sortingName) => {
   currentFilter = sortingName;
+  let sortingParam;
   switch (sortingName) {
     case `sorting-event`:
-      return sortingByFilter(data, `type`);
-
+      sortingParam = `type`;
+      break;
     case `sorting-time`:
-      return sortingByFilter(data, `duration`);
+      sortingParam = `duration`;
+      break;
 
     case `sorting-price`:
-      return sortingByFilter(data, `price`);
+      sortingParam = `price`;
+      break;
   }
+  return sortingByFilter(data, sortingParam);
 };
 
 const sortingByFilter = (data, parameter) => {

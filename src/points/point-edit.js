@@ -62,7 +62,7 @@ class PointEdit extends component {
             <header class="point__header">
               <label class="point__date">
                 choose day
-                <input class="point__input" type="text" placeholder="${this.date.day} ${this.date.month}" value="${this.date.day} ${this.date.month}" name="day">
+                <input class="point__input" type="text" placeholder="${this.date.day} ${this.date.month}" value="${this.date.day} ${this.date.month}" name="day" required>
               </label>
 
               <div class="travel-way">
@@ -111,8 +111,8 @@ class PointEdit extends component {
 
                 <div class="point__time">
                   choose time
-                  <input class="point__input" type="text" value="${this._time.from}" name="date-start" placeholder="19:00">
-                  <input class="point__input" type="text" value="${this._time.due}" name="date-end" placeholder="21:00">
+                  <input class="point__input" type="text" value="${this._time.from}" name="date-start" placeholder="19:00" required>
+                  <input class="point__input" type="text" value="${this._time.due}" name="date-end" placeholder="21:00" required>
                 </div>
 
                 <label class="point__price">
@@ -221,6 +221,43 @@ class PointEdit extends component {
       };
     });
   }
+
+  _calenderInit() {
+    const dateStart = this.element.querySelector(`.point__time input[name="date-start"]`);
+    const dateEnd = this.element.querySelector(`.point__time input[name="date-end"]`);
+    flatpickr(dateStart, {
+      'defaultDate': [this._date],
+      'minDate': this._date,
+      'enableTime': true,
+      'time_24hr': true,
+      'dateFormat': `H:i`,
+      'onChange': (selectedDates) => {
+        this._date = selectedDates[0];
+        this._year = this._date.getFullYear();
+        if (this._date && this._dateDue) {
+          this._time = getTime(this._date, this._dateDue);
+        }
+      },
+    });
+
+    flatpickr(dateEnd, {
+      'defaultDate': [this._dateDue],
+      'enableTime': true,
+      'minDate': this._date,
+      'time_24hr': true,
+      'dateFormat': `H:i`,
+      'onChange': (selectedDates) => {
+        this._dateDue = selectedDates[0];
+        if (this._date && this._dateDue) {
+          this._time = getTime(this._date, this._dateDue);
+        }
+      },
+    });
+  }
+  _getDayCode(date) {
+    return date.getDate() + (date.getMonth() + 1) + date.getFullYear();
+  }
+
   _partialUpdate() {
     const currentElement = createElement(this.template);
     let filledContainer = document.createElement(`div`).innerHTML;
@@ -260,8 +297,6 @@ class PointEdit extends component {
     }
   }
   bind() {
-    const dateStart = this.element.querySelector(`.point__time input[name="date-start"]`);
-    const dateEnd = this.element.querySelector(`.point__time input[name="date-end"]`);
     const form = this.element.querySelector(`form`);
 
     form.addEventListener(`submit`, this._onSubmitButtonClick);
@@ -275,34 +310,7 @@ class PointEdit extends component {
 
     this._element.querySelector(`.point__destination-input`)
       .addEventListener(`change`, this._onChangeDestination);
-
-    flatpickr(dateStart, {
-      'defaultDate': [this._date],
-      'minDate': this._date,
-      'enableTime': true,
-      'time_24hr': true,
-      'dateFormat': `H:i`,
-      'onChange': (selectedDates) => {
-        this._date = selectedDates[0];
-        if (this._date && this._dateDue) {
-          this._time = getTime(this._date, this._dateDue);
-        }
-      },
-    });
-
-    flatpickr(dateEnd, {
-      'defaultDate': [this._dateDue],
-      'enableTime': true,
-      'minDate': this._date,
-      'time_24hr': true,
-      'dateFormat': `H:i`,
-      'onChange': (selectedDates) => {
-        this._dateDue = selectedDates[0];
-        if (this._date && this._dateDue) {
-          this._time = getTime(this._date, this._dateDue);
-        }
-      },
-    });
+    this._calenderInit();
 
     this._createCycleListeners();
   }
@@ -360,8 +368,15 @@ class PointEdit extends component {
       case `day`:
         this._day = currentValue.split(` `)[0];
         this._month = currentValue.split(` `)[1];
-        let year = currentValue.split(` `)[2];
-        this._date = new Date(`${this._day}, ${this._month}, ${year}`);
+        this._date = new Date(`${this._day}, ${this._month}, ${this._year}, ${this._time.from}`);
+        let dayCode = this._getDayCode(this._date);
+        let dateDueCode = this._getDayCode(this._dateDue);
+
+        if (dayCode > dateDueCode) {
+          this._dateDue = new Date(`${this._day}, ${this._month}, ${this._year}, ${this._time.due}`);
+        }
+
+        this._calenderInit();
         break;
       case `price`:
         this._price = currentValue;
