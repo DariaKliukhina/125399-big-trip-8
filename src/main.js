@@ -189,9 +189,16 @@ newTask.addEventListener(`click`, (e) => {
     newTask.removeAttribute(`disabled`);
   };
 
+  pointEdit.onNewCardUpdate = () => {
+    const priceInput = pointEdit._element.querySelector(`.point__input[name="price"]`);
+    priceInput.removeAttribute(`readonly`);
+  };
+
   tripPoints.insertBefore(pointEdit.render(), tripPoints.firstChild);
   const priceInput = pointEdit._element.querySelector(`.point__input[name="price"]`);
   priceInput.removeAttribute(`readonly`);
+
+
 });
 
 for (const btn of statBtns) {

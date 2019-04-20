@@ -35,6 +35,7 @@ class PointEdit extends component {
     this._element = null;
     this._onSubmit = null;
     this._onEsc = null;
+    this._onNewCardUpdate = null;
     this._onDelete = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onFormDelete = this._onFormDelete.bind(this);
@@ -52,6 +53,9 @@ class PointEdit extends component {
   }
   set onDelete(fn) {
     this._onDelete = fn;
+  }
+  set onNewCardUpdate(fn) {
+    this._onNewCardUpdate = fn;
   }
   set onSubmit(fn) {
     this._onSubmit = fn;
@@ -270,6 +274,10 @@ class PointEdit extends component {
     let filledContainer = document.createElement(`div`).innerHTML;
     filledContainer = currentElement;
     this._element.innerHTML = filledContainer.firstElementChild.outerHTML;
+
+    if (typeof this._onNewCardUpdate === `function`) {
+      this._onNewCardUpdate();
+    }
   }
   _createCycleListeners() {
     const offersInput = this._element.querySelectorAll(`.point__offers-input`);
