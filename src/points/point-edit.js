@@ -1,7 +1,10 @@
-import component from '../components/component';
+import component from '../components/point-component';
 import {createElement} from "../utils/create-element";
 import {getTime, types} from "../utils/helpers";
 import flatpickr from 'flatpickr';
+
+const ESC = 27;
+const ANIMATION_TIMEOUT = 600;
 
 class PointEdit extends component {
   constructor(data) {
@@ -46,11 +49,9 @@ class PointEdit extends component {
   set onEsc(fn) {
     this._onEsc = fn;
   }
-
   set onDelete(fn) {
     this._onDelete = fn;
   }
-
   set onSubmit(fn) {
     this._onSubmit = fn;
   }
@@ -117,7 +118,7 @@ class PointEdit extends component {
                 <label class="point__price">
                   write price
                   <span class="point__price-currency">€</span>
-                  <input class="point__input" type="text" value="${this._price}" name="price">
+                  <input class="point__input" type="text" value="${this._price}" name="price" readonly>
               </label>
 
               <div class="point__buttons">
@@ -205,95 +206,13 @@ class PointEdit extends component {
     this._dateDue = data.dateDue;
     this._isFavorite = data.isFavorite;
   }
-
   shake() {
-    const ANIMATION_TIMEOUT = 600;
     this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
 
     setTimeout(() => {
       this._element.style.animation = ``;
     }, ANIMATION_TIMEOUT);
   }
-  _onKeyDown(e) {
-    const ESC = 27;
-    if (e.keyCode === ESC) {
-      if (typeof this._onEsc === `function`) {
-        this._onEsc(this._startObject);
-        this._offers = this._startObject.offers.map((a) => Object.assign({}, a));
-      }
-    }
-  }
-
-  _onSubmitButtonClick(e) {
-    e.preventDefault();
-
-    const formData = new FormData(this._element.querySelector(`.point > form`));
-    const newData = this._processForm(formData);
-    if (typeof this._onSubmit === `function`) {
-      this._onSubmit(newData);
-    }
-
-    this.update(newData);
-  }
-
-  _onFormDelete(evt) {
-    evt.preventDefault();
-    if (typeof this._onDelete === `function`) {
-      this._onDelete({id: this._id});
-    }
-  }
-
-  _onCheckedChange(e) {
-    for (let offer of this._offers) {
-      if (e.target.id === offer.title.split(` `).join(`-`).toLocaleLowerCase()) {
-        offer.accepted = e.currentTarget.checked;
-      }
-    }
-  }
-
-  _onInputsChange(e) {
-    let currentName = e.target.name;
-    let currentValue = e.target.value;
-
-    switch (currentName) {
-      case `day`:
-        this._day = currentValue.split(` `)[0];
-        this._month = currentValue.split(` `)[1];
-        let year = currentValue.split(` `)[2];
-        this._date = new Date(`${this._day}, ${this._month}, ${year}`);
-        break;
-      case `price`:
-        this._price = currentValue;
-        break;
-    }
-  }
-  _onFavoriteChange() {
-    this._isFavorite = !this._isFavorite;
-  }
-
-  _onEventChange(e) {
-    let typeName = e.target.value;
-
-    this._type = typeName;
-    this._typeIcon = types[typeName];
-    for (const offer of this._offers) {
-      if (offer.accepted) {
-        this._price -= offer.price;
-      }
-    }
-
-    PointEdit._allOffersData.forEach((offersByType) => {
-      if (offersByType.type === typeName) {
-        this._offers = this._convertOffers(offersByType.offers);
-        this._startObject.offers = this._offers.map((a) => Object.assign({}, a));
-        this._startObject.isFavorite = this._isFavorite;
-      }
-    });
-
-    this._partialUpdate();
-    this.bind();
-  }
-
   _convertOffers(offers) {
     return offers.map((offer) => {
       return {
@@ -302,45 +221,12 @@ class PointEdit extends component {
       };
     });
   }
-
-  _onOfferChange(e) {
-    this._price = Number(this._price);
-    if (e.target.checked === true) {
-      this._price += Number(e.target.value);
-    } else {
-      this._price -= Number(e.target.value);
-    }
-
-    this._onCheckedChange(e);
-    this._partialUpdate();
-    this.bind();
-  }
-
-  _onChangeDestination() {
-    const destInput = this._element.querySelector(`.point__destination-input`);
-    let newDestination;
-    if (PointEdit._destinations.some((destination) => destInput.value === destination.name)) {
-      PointEdit._destinations.forEach((destination) => {
-        if (destination.name === destInput.value) {
-          newDestination = destination;
-        }
-      });
-      this._city = newDestination.name;
-      this._description = newDestination.description;
-      this._picture = newDestination.pictures;
-      this._partialUpdate();
-    }
-
-    this.bind();
-  }
-
   _partialUpdate() {
     const currentElement = createElement(this.template);
     let filledContainer = document.createElement(`div`).innerHTML;
     filledContainer = currentElement;
     this._element.innerHTML = filledContainer.firstElementChild.outerHTML;
   }
-
   _createCycleListeners() {
     const offersInput = this._element.querySelectorAll(`.point__offers-input`);
     for (let i = 0; i < offersInput.length; i++) {
@@ -357,7 +243,6 @@ class PointEdit extends component {
       inputs[i].addEventListener(`change`, this._onInputsChange);
     }
   }
-
   _removeCycleListeners() {
     const offersInput = this._element.querySelectorAll(`.point__offers-input`);
     for (let i = 0; i < offersInput.length; i++) {
@@ -374,7 +259,6 @@ class PointEdit extends component {
       inputs[i].removeEventListener(`change`, this._onInputsChange);
     }
   }
-
   bind() {
     const dateStart = this.element.querySelector(`.point__time input[name="date-start"]`);
     const dateEnd = this.element.querySelector(`.point__time input[name="date-end"]`);
@@ -422,7 +306,6 @@ class PointEdit extends component {
 
     this._createCycleListeners();
   }
-
   unbind() {
     this._element.removeEventListener(`submit`, this._onSubmitButtonClick);
 
@@ -437,6 +320,107 @@ class PointEdit extends component {
       .removeEventListener(`change`, this._onChangeDestination);
 
     this._removeCycleListeners();
+  }
+  _onKeyDown(e) {
+    if (e.keyCode === ESC) {
+      if (typeof this._onEsc === `function`) {
+        this._onEsc(this._startObject);
+        this._offers = this._startObject.offers.map((a) => Object.assign({}, a));
+      }
+    }
+  }
+  _onSubmitButtonClick(e) {
+    e.preventDefault();
+    const formData = new FormData(this._element.querySelector(`.point > form`));
+    const newData = this._processForm(formData);
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit(newData);
+    }
+
+    this.update(newData);
+  }
+  _onFormDelete(evt) {
+    evt.preventDefault();
+    if (typeof this._onDelete === `function`) {
+      this._onDelete({id: this._id});
+    }
+  }
+  _onCheckedChange(e) {
+    for (let offer of this._offers) {
+      if (e.target.id === offer.title.split(` `).join(`-`).toLocaleLowerCase()) {
+        offer.accepted = e.currentTarget.checked;
+      }
+    }
+  }
+  _onInputsChange(e) {
+    let currentName = e.target.name;
+    let currentValue = e.target.value;
+
+    switch (currentName) {
+      case `day`:
+        this._day = currentValue.split(` `)[0];
+        this._month = currentValue.split(` `)[1];
+        let year = currentValue.split(` `)[2];
+        this._date = new Date(`${this._day}, ${this._month}, ${year}`);
+        break;
+      case `price`:
+        this._price = currentValue;
+        break;
+    }
+  }
+  _onFavoriteChange() {
+    this._isFavorite = !this._isFavorite;
+  }
+  _onEventChange(e) {
+    let typeName = e.target.value;
+
+    this._type = typeName;
+    this._typeIcon = types[typeName];
+    for (const offer of this._offers) {
+      if (offer.accepted) {
+        this._price -= offer.price;
+      }
+    }
+
+    PointEdit._allOffersData.forEach((offersByType) => {
+      if (offersByType.type === typeName) {
+        this._offers = this._convertOffers(offersByType.offers);
+        this._startObject.offers = this._offers.map((a) => Object.assign({}, a));
+        this._startObject.isFavorite = this._isFavorite;
+      }
+    });
+
+    this._partialUpdate();
+    this.bind();
+  }
+  _onOfferChange(e) {
+    this._price = Number(this._price);
+    if (e.target.checked === true) {
+      this._price += Number(e.target.value);
+    } else {
+      this._price -= Number(e.target.value);
+    }
+
+    this._onCheckedChange(e);
+    this._partialUpdate();
+    this.bind();
+  }
+  _onChangeDestination() {
+    const destInput = this._element.querySelector(`.point__destination-input`);
+    let newDestination;
+    if (PointEdit._destinations.some((destination) => destInput.value === destination.name)) {
+      PointEdit._destinations.forEach((destination) => {
+        if (destination.name === destInput.value) {
+          newDestination = destination;
+        }
+      });
+      this._city = newDestination.name;
+      this._description = newDestination.description;
+      this._picture = newDestination.pictures;
+      this._partialUpdate();
+    }
+
+    this.bind();
   }
   static createMapper(target) {
     return {
@@ -460,7 +444,6 @@ class PointEdit extends component {
   static setDestinations(data) {
     this._destinations = data;
   }
-
   static setAllOffers(data) {
     this._allOffersData = data;
   }

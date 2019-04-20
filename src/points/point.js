@@ -1,4 +1,4 @@
-import component from '../components/component';
+import component from '../components/point-component';
 
 class Point extends component {
   constructor(data) {
@@ -63,12 +63,6 @@ class Point extends component {
     this._dateDue = data.dateDue;
   }
 
-  _onEditClick() {
-    if (typeof this._onClick === `function`) {
-      this._onClick();
-    }
-  }
-
   _partialUpdate() {
     this._element.innerHTML = this.template;
   }
@@ -80,8 +74,11 @@ class Point extends component {
   unbind() {
     this._element.removeEventListener(`click`, this._onEditClick);
   }
-
-
+  _onEditClick() {
+    if (typeof this._onClick === `function`) {
+      this._onClick();
+    }
+  }
 }
 
 export default Point;

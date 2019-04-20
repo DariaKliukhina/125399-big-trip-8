@@ -1,4 +1,4 @@
-import TotalCost from '../components/total-price';
+import TotalCost from '../components/total-cost';
 
 const getRandomNum = (count) => {
   return Math.floor(Math.random() * count);

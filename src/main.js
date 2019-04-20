@@ -8,16 +8,15 @@ import ModelPoint from "./points-adapter";
 import {updateCharts} from "./statistic";
 import {setTotalCost, sortPointsByDay} from './utils/helpers';
 
+const HIDDEN_CLASS = `visually-hidden`;
+const ACTIVE_STAT = `view-switch__item--active`;
+
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
 const mainSorting = document.querySelector(`.trip-sorting`);
 const offersBlock = document.querySelector(`.trip-sorting__item--offers`);
 const newTask = document.querySelector(`.new-event`);
 const totaCostContainer = document.querySelector(`.trip__total`);
-
-const HIDDEN_CLASS = `visually-hidden`;
-const ACTIVE_STAT = `view-switch__item--active`;
-
 const statBtns = document.querySelectorAll(`.view-switch__item`);
 const pointsContainer = document.querySelector(`.main`);
 const statisticContainer = document.querySelector(`.statistic`);
@@ -120,7 +119,6 @@ function renderFilters(filtersData) {
   });
 }
 
-
 const renderPoints = (data) => {
   tripPoints.innerHTML = ``;
   setTotalCost(data, totaCostContainer);
@@ -185,6 +183,8 @@ newTask.addEventListener(`click`, () => {
   };
 
   tripPoints.insertBefore(pointEdit.render(), tripPoints.firstChild);
+  const priceInput = pointEdit._element.querySelector(`.point__input[name="price"]`);
+  priceInput.removeAttribute(`readonly`);
 });
 
 for (const btn of statBtns) {
