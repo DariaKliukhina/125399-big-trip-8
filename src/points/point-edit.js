@@ -41,6 +41,7 @@ class PointEdit extends component {
     this._onFavoriteChange = this._onFavoriteChange.bind(this);
     this._onInputsChange = this._onInputsChange.bind(this);
     this._onKeyDown = this._onKeyDown.bind(this);
+    this._onNewAdd = this._onNewAdd.bind(this);
     this._onEventChange = this._onEventChange.bind(this);
     this._onOfferChange = this._onOfferChange.bind(this);
     this._onChangeDestination = this._onChangeDestination.bind(this);
@@ -193,6 +194,12 @@ class PointEdit extends component {
 
     return entry;
   }
+  reset() {
+    if (typeof this._onEsc === `function`) {
+      this._onEsc(this._startObject);
+      this._offers = this._startObject.offers.map((a) => Object.assign({}, a));
+    }
+  }
   update(data) {
     this._city = data.city;
     this._type = data.type;
@@ -298,7 +305,8 @@ class PointEdit extends component {
   }
   bind() {
     const form = this.element.querySelector(`form`);
-
+    const newTask = document.querySelector(`.new-event`);
+    newTask.addEventListener(`click`, this._onNewAdd);
     form.addEventListener(`submit`, this._onSubmitButtonClick);
 
     document.addEventListener(`keydown`, this._onKeyDown);
@@ -315,6 +323,8 @@ class PointEdit extends component {
     this._createCycleListeners();
   }
   unbind() {
+    const newTask = document.querySelector(`.new-event`);
+    newTask.removeEventListener(`click`, this._onNewAdd);
     this._element.removeEventListener(`submit`, this._onSubmitButtonClick);
 
     document.removeEventListener(`keydown`, this._onKeyDown);
@@ -331,11 +341,11 @@ class PointEdit extends component {
   }
   _onKeyDown(e) {
     if (e.keyCode === ESC) {
-      if (typeof this._onEsc === `function`) {
-        this._onEsc(this._startObject);
-        this._offers = this._startObject.offers.map((a) => Object.assign({}, a));
-      }
+      this.reset();
     }
+  }
+  _onNewAdd() {
+    this.reset();
   }
   _onSubmitButtonClick(e) {
     e.preventDefault();
