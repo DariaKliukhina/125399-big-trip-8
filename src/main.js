@@ -135,7 +135,9 @@ const renderPoints = (data) => {
   });
 };
 
-newTask.addEventListener(`click`, () => {
+newTask.addEventListener(`click`, (e) => {
+  e.target.setAttribute(`disabled`, true);
+
   const newPoint = {
     'id': String(Date.now()),
     'date_from': new Date(),
@@ -177,9 +179,12 @@ newTask.addEventListener(`click`, () => {
         renderPoints(pointsByDay);
         setTotalCost(pointsByDay, totaCostContainer);
       });
+
+    newTask.removeAttribute(`disabled`);
   };
   pointEdit.onDelete = () => {
     pointEdit.unrender();
+    newTask.removeAttribute(`disabled`);
   };
 
   tripPoints.insertBefore(pointEdit.render(), tripPoints.firstChild);
@@ -197,7 +202,13 @@ for (const btn of statBtns) {
     closeAllContainer();
     e.target.classList.add(ACTIVE_STAT);
     const target = e.target.href.split(`#`)[1];
-
+    if (target === `stats`) {
+      newTask.setAttribute(`disabled`, true);
+      newTask.style = `opacity: 0;`;
+    } else {
+      newTask.removeAttribute(`disabled`);
+      newTask.style = `opacity: 1;`;
+    }
     const targetContainer = document.querySelector(`#${target}`);
     targetContainer.classList.remove(HIDDEN_CLASS);
     updateCharts(pointsByDay);
