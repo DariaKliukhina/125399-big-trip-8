@@ -1,4 +1,4 @@
-import component from '../components/component';
+import component from '../components/point-component';
 
 class Sorting extends component {
   constructor(data) {
@@ -17,18 +17,16 @@ class Sorting extends component {
     <input type="radio" name="trip-sorting" id="${this._id}" value="${this._name.toLowerCase()}" ${this._isChecked ? `checked` : ``}>
     <label class="trip-sorting__item trip-sorting__item--${this._name.toLowerCase()}" for="sorting-${this._name.toLowerCase()}">${this._name}</label></span>`.trim();
   }
-  _onSortingClick() {
-    return typeof this._onSorting === `function` && this._onSorting();
-  }
-
   bind() {
     this._element.querySelector(`.trip-sorting__item`)
       .addEventListener(`click`, this._onSortingClick);
   }
-
   unbind() {
     this._element.querySelector(`.trip-sorting__item`)
       .removeEventListener(`click`, this._onSortingClick);
+  }
+  _onSortingClick() {
+    return typeof this._onSorting === `function` && this._onSorting();
   }
 }
 

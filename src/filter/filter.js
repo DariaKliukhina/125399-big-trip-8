@@ -1,4 +1,4 @@
-import component from '../components/component';
+import component from '../components/point-component';
 
 class Filter extends component {
   constructor(data) {
@@ -14,11 +14,6 @@ class Filter extends component {
   set onFilter(fn) {
     this._onFilter = fn;
   }
-
-  _onFilterClick() {
-    return typeof this._onFilter === `function` && this._onFilter();
-  }
-
   get template() {
     return `<span class="filter-wrap">
   <input type="radio" class="trip-filter__input" id="${this._id}" name="filter" value="${this._name.toLowerCase()}" ${this._isChecked ? `checked` : ``}>
@@ -33,6 +28,9 @@ class Filter extends component {
   unbind() {
     this._element.querySelector(`.trip-filter__input`)
       .removeEventListener(`click`, this._onFilterClick);
+  }
+  _onFilterClick() {
+    return typeof this._onFilter === `function` && this._onFilter();
   }
 }
 

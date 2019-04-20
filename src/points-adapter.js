@@ -11,9 +11,10 @@ class ModelPoint {
     this.price = data[`base_price`];
     this.offers = data[`offers`];
     this.day = this._formatNewDate(data[`date_from`]).tripDay;
-    this.month = this._formatNewDate(data[`date_from`]).tripMonth + ` ` + this._formatNewDate(data[`date_from`]).tripYear;
+    this.month = this._formatNewDate(data[`date_from`]).tripMonth;
     this.uniqueDay = this._formatNewDate(data[`date_from`]).uniqueDay;
     this.date = new Date(data[`date_from`]);
+    this.year = this.date.getFullYear();
     this.dateDue = new Date(data[`date_to`]);
     this.time = getTime(this.date, this.dateDue);
     this.isFavorite = Boolean(data[`is_favorite`]);

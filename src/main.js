@@ -8,16 +8,15 @@ import ModelPoint from "./points-adapter";
 import {updateCharts} from "./statistic";
 import {setTotalCost, sortPointsByDay} from './utils/helpers';
 
+const HIDDEN_CLASS = `visually-hidden`;
+const ACTIVE_STAT = `view-switch__item--active`;
+
 const tripPoints = document.querySelector(`.trip-points`);
 const mainFilter = document.querySelector(`.trip-filter`);
 const mainSorting = document.querySelector(`.trip-sorting`);
 const offersBlock = document.querySelector(`.trip-sorting__item--offers`);
 const newTask = document.querySelector(`.new-event`);
 const totaCostContainer = document.querySelector(`.trip__total`);
-
-const HIDDEN_CLASS = `visually-hidden`;
-const ACTIVE_STAT = `view-switch__item--active`;
-
 const statBtns = document.querySelectorAll(`.view-switch__item`);
 const pointsContainer = document.querySelector(`.main`);
 const statisticContainer = document.querySelector(`.statistic`);
@@ -53,25 +52,26 @@ function renderSorting(sortingData) {
 renderSorting(sortingRawData);
 
 let pointsByDay = new Map();
-
+let currentFilter;
 const sortingPoints = (data, sortingName) => {
-  let sortingParameter;
+  currentFilter = sortingName;
+  let sortingParam;
   switch (sortingName) {
     case `sorting-event`:
-      sortingParameter = `type`;
+      sortingParam = `type`;
       break;
     case `sorting-time`:
-      sortingParameter = `duration`;
+      sortingParam = `duration`;
       break;
+
     case `sorting-price`:
-      sortingParameter = `price`;
+      sortingParam = `price`;
       break;
   }
-
-  return pointSorting(data, sortingParameter);
+  return sortingByFilter(data, sortingParam);
 };
 
-const pointSorting = (data, parameter) => {
+const sortingByFilter = (data, parameter) => {
   data.forEach((day) => {
     if (day.length > 1) {
       day.sort(function (a, b) {
@@ -120,7 +120,6 @@ function renderFilters(filtersData) {
   });
 }
 
-
 const renderPoints = (data) => {
   tripPoints.innerHTML = ``;
   setTotalCost(data, totaCostContainer);
@@ -131,13 +130,16 @@ const renderPoints = (data) => {
       api.getPoints()
         .then((remainPoints) => {
           sortPointsByDay(remainPoints, pointsByDay);
-          renderPoints(pointsByDay);
+          const sortedPoints = sortingPoints(pointsByDay, currentFilter);
+          renderPoints(sortedPoints);
         });
     };
   });
 };
 
-newTask.addEventListener(`click`, () => {
+newTask.addEventListener(`click`, (e) => {
+  e.target.setAttribute(`disabled`, true);
+
   const newPoint = {
     'id': String(Date.now()),
     'date_from': new Date(),
@@ -168,7 +170,6 @@ newTask.addEventListener(`click`, () => {
     newPoint[`base_price`] = newObject.price;
     newPoint[`date_from`] = newObject.date.getTime();
     newPoint[`date_to`] = newObject.dateDue.getTime();
-
     const obj = ModelPoint.parsePoint(newPoint).toRAW();
     api.createPoint({point: obj})
       .then();
@@ -176,15 +177,28 @@ newTask.addEventListener(`click`, () => {
     api.getPoints()
       .then((points) => {
         sortPointsByDay(points, pointsByDay);
-        renderPoints(pointsByDay);
+        const sortedPoints = sortingPoints(pointsByDay, currentFilter);
+        renderPoints(sortedPoints);
         setTotalCost(pointsByDay, totaCostContainer);
       });
+
+    newTask.removeAttribute(`disabled`);
   };
   pointEdit.onDelete = () => {
     pointEdit.unrender();
+    newTask.removeAttribute(`disabled`);
+  };
+
+  pointEdit.onNewCardUpdate = () => {
+    const priceInput = pointEdit._element.querySelector(`.point__input[name="price"]`);
+    priceInput.removeAttribute(`readonly`);
   };
 
   tripPoints.insertBefore(pointEdit.render(), tripPoints.firstChild);
+  const priceInput = pointEdit._element.querySelector(`.point__input[name="price"]`);
+  priceInput.removeAttribute(`readonly`);
+
+
 });
 
 for (const btn of statBtns) {
@@ -197,7 +211,13 @@ for (const btn of statBtns) {
     closeAllContainer();
     e.target.classList.add(ACTIVE_STAT);
     const target = e.target.href.split(`#`)[1];
-
+    if (target === `stats`) {
+      newTask.setAttribute(`disabled`, true);
+      newTask.style = `opacity: 0;`;
+    } else {
+      newTask.removeAttribute(`disabled`);
+      newTask.style = `opacity: 1;`;
+    }
     const targetContainer = document.querySelector(`#${target}`);
     targetContainer.classList.remove(HIDDEN_CLASS);
     updateCharts(pointsByDay);
