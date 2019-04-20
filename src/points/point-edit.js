@@ -103,7 +103,7 @@ class PointEdit extends component {
 
               <div class="point__destination-wrap">
                 <label class="point__destination-label" for="destination"><span class="point__destination-type">${this._type}</span> to</label>
-                <input class="point__destination-input" list="destination-select" id="destination" value="${this._city}" name="destination">
+                <input class="point__destination-input" list="destination-select" id="destination" value="${this._city}" name="destination" required>
                 <datalist id="destination-select">
                    ${PointEdit._destinations.map((dest) =>`<option value="${dest.name}"></option>`).join(``).trim()}
                   </datalist>

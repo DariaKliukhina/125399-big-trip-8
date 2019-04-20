@@ -52,25 +52,22 @@ function renderSorting(sortingData) {
 renderSorting(sortingRawData);
 
 let pointsByDay = new Map();
-
+let currentFilter;
 const sortingPoints = (data, sortingName) => {
-  let sortingParameter;
+  currentFilter = sortingName;
   switch (sortingName) {
     case `sorting-event`:
-      sortingParameter = `type`;
-      break;
-    case `sorting-time`:
-      sortingParameter = `duration`;
-      break;
-    case `sorting-price`:
-      sortingParameter = `price`;
-      break;
-  }
+      return sortingByFilter(data, `type`);
 
-  return pointSorting(data, sortingParameter);
+    case `sorting-time`:
+      return sortingByFilter(data, `duration`);
+
+    case `sorting-price`:
+      return sortingByFilter(data, `price`);
+  }
 };
 
-const pointSorting = (data, parameter) => {
+const sortingByFilter = (data, parameter) => {
   data.forEach((day) => {
     if (day.length > 1) {
       day.sort(function (a, b) {
@@ -129,7 +126,8 @@ const renderPoints = (data) => {
       api.getPoints()
         .then((remainPoints) => {
           sortPointsByDay(remainPoints, pointsByDay);
-          renderPoints(pointsByDay);
+          const sortedPoints = sortingPoints(pointsByDay, currentFilter);
+          renderPoints(sortedPoints);
         });
     };
   });
@@ -168,7 +166,6 @@ newTask.addEventListener(`click`, (e) => {
     newPoint[`base_price`] = newObject.price;
     newPoint[`date_from`] = newObject.date.getTime();
     newPoint[`date_to`] = newObject.dateDue.getTime();
-
     const obj = ModelPoint.parsePoint(newPoint).toRAW();
     api.createPoint({point: obj})
       .then();
@@ -176,7 +173,8 @@ newTask.addEventListener(`click`, (e) => {
     api.getPoints()
       .then((points) => {
         sortPointsByDay(points, pointsByDay);
-        renderPoints(pointsByDay);
+        const sortedPoints = sortingPoints(pointsByDay, currentFilter);
+        renderPoints(sortedPoints);
         setTotalCost(pointsByDay, totaCostContainer);
       });
 
