@@ -1,6 +1,5 @@
 import PointComponent from './point-component';
 
-
 class TotalCost extends PointComponent {
   constructor() {
     super();
