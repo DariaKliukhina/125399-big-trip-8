@@ -115,6 +115,7 @@ function renderFilters(filtersData) {
           sortPointsByDay(filteredPoints, pointsByDay);
           renderPoints(pointsByDay);
           setTotalCost(pointsByDay, totaCostContainer);
+          updateCharts(pointsByDay);
         });
     };
   });
@@ -197,8 +198,6 @@ newTask.addEventListener(`click`, (e) => {
   tripPoints.insertBefore(pointEdit.render(), tripPoints.firstChild);
   const priceInput = pointEdit._element.querySelector(`.point__input[name="price"]`);
   priceInput.removeAttribute(`readonly`);
-
-
 });
 
 for (const btn of statBtns) {
